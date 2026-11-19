@@ -487,3 +487,13 @@ details.acc .acc-body { padding: 0 var(--sp-4) var(--sp-4); color: var(--text-2)
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+/* ปรับขนาดโลโก้และปุ่มแถบบนให้พอดีจอมือถือ */
+@media (max-width: 559px) {
+  .header-in { gap: 6px; padding: 0 10px; }
+  .brand { gap: 6px; flex: 1; min-width: 0; }
+  .brand-mark { width: 36px; }
+  .brand-name { font-size: 1.05rem; }
+  .brand-sub { font-size: .7rem; }
+  .header-tools { gap: 0; flex: none; margin-left: 0; }
+  .icon-btn { width: 36px; height: 36px; }
+}
