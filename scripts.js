@@ -598,16 +598,25 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbytuBeIQQQ5DEucp7UiRl
     if (ALIAS[k]) k = ALIAS[k];
     return PAGES[k] ? k : 'home';
   }
-  function pushHistory(page, params) {
-    var q = { page: page };
-    if (params && params.q) q.q = params.q;
+  function urlFor(page, params) {
+    var u = '?page=' + encodeURIComponent(page);
+    if (params && params.q) u += '&q=' + encodeURIComponent(params.q);
+    return u;
+  }
+  function pageFromUrl() {
+    var out = { page: 'home', params: {} };
     try {
-      if (window.google && google.script && google.script.history) {
-        google.script.history.push({ page: page, params: params || {} }, q, '');
-      } else if (window.history && history.pushState) {
-        history.pushState({ page: page, params: params || {} }, '');
-      }
-    } catch (e) { /* บางสภาพแวดล้อมไม่อนุญาต ไม่กระทบการใช้งาน */ }
+      var sp = new URLSearchParams(window.location.search);
+      out.page = resolvePage(sp.get('page') || 'home');
+      var q = sp.get('q');
+      if (q) out.params.q = q.slice(0, 80);
+    } catch (e) { /* ใช้หน้าหลัก */ }
+    return out;
+  }
+  function pushHistory(page, params) {
+    try {
+      if (window.history && history.pushState) history.pushState({ page: page, params: params || {} }, '', urlFor(page, params));
+    } catch (e) { /* ไม่กระทบการใช้งาน */ }
   }
   function navigate(page, params, opts) {
     opts = opts || {};
@@ -622,21 +631,10 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbytuBeIQQQ5DEucp7UiRl
     speakPage(state.page);
   }
   function setupHistory() {
-    try {
-      if (window.google && google.script && google.script.history) {
-        google.script.history.replace({ page: state.page, params: state.params }, { page: state.page }, '');
-        google.script.history.setChangeHandler(function (ev) {
-          var st = ev && ev.state;
-          var qp = ev && ev.location && ev.location.parameters && ev.location.parameters.page;
-          var pg = (st && st.page) || (qp && qp[0]) || 'home';
-          navigate(pg, (st && st.params) || {}, { push: false });
-        });
-        return;
-      }
-    } catch (e) { /* ใช้ popstate แทน */ }
+    try { history.replaceState({ page: state.page, params: state.params }, '', urlFor(state.page, state.params)); } catch (e) { /* ignore */ }
     window.addEventListener('popstate', function (ev) {
-      var st = ev.state;
-      navigate((st && st.page) || 'home', (st && st.params) || {}, { push: false });
+      var st = ev.state || pageFromUrl();
+      navigate(st.page || 'home', st.params || {}, { push: false });
     });
   }
 
@@ -650,7 +648,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbytuBeIQQQ5DEucp7UiRl
     if (!hasBackend()) {
       state.loading = false;
       state.data = EMPTY;
-      state.error = { type: 'nobackend', msg: 'ไม่พบการเชื่อมต่อ Google Apps Script — กรุณาเปิดผ่าน Web App ที่ Deploy แล้ว (ลิงก์ที่ลงท้ายด้วย /exec หรือ /dev)' };
+      state.error = { type: 'nobackend', msg: 'ยังไม่ได้ตั้งค่าที่อยู่เซิร์ฟเวอร์ (GAS_API_URL) ในไฟล์ scripts.js' };
       onDataReady();
       return;
     }
@@ -1418,7 +1416,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbytuBeIQQQ5DEucp7UiRl
       }
     }).catch(function (err) {
       var msg = (err && err.message === 'NO_BACKEND')
-        ? 'ไม่พบการเชื่อมต่อ Google Apps Script — กรุณาเปิดผ่าน Web App ที่ Deploy แล้ว'
+        ? 'ยังไม่ได้ตั้งค่าที่อยู่เซิร์ฟเวอร์ (GAS_API_URL) ในไฟล์ scripts.js'
         : 'เชื่อมต่อระบบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง หรือติดต่อเจ้าหน้าที่โดยตรง';
       s.messages.push({ role: 'ai', text: msg, error: true });
     }).then(function () {
@@ -1581,7 +1579,9 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbytuBeIQQQ5DEucp7UiRl
   }
   function init() {
     var app = $('#app');
-    state.page = resolvePage(app ? app.getAttribute('data-initial-page') : 'home');
+    var start = pageFromUrl();   // รองรับ Deep Link เช่น ?page=chat (ไม่พึ่ง Apps Script แล้ว)
+    state.page = start.page;
+    state.params = start.params;
     hydrateStatic();
     bindEvents();
     initVoice();
