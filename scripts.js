@@ -1,2108 +1,2109 @@
-/* ==========================================================
- * NICC Smart PR - Styles.html
- * CSS ล้วน (ไม่มีแท็กครอบ) - Index.html ครอบให้แล้ว
- * Mobile-first: 320-767 / Tablet 768-1023 / Desktop 1024+
- * ========================================================== */
-
-/* ==========================================================
- * 1. DESIGN TOKENS
- * ========================================================== */
-
-:root {
-  /* Brand colors */
-  --navy: #0B2E8A;
-  --blue: #1565FF;
-  --sky: #3EB7FF;
-  --yellow: #FFC629;
-  --white: #FFFFFF;
-  --bg: #F2F7FD;
-  --text: #1E293B;
-
-  /* Support colors */
-  --muted: #5B6B8C;
-  --line: #DCE8F7;
-  --card: #FFFFFF;
-  --tint: #E8F2FF;
-  --ok: #16A34A;
-  --danger: #C23B3B;
-  --warn-bg: #FFF4D1;
-  --warn-text: #5C4300;
-
-  /* Gradients */
-  --grad-blue: linear-gradient(135deg, #1565FF 0%, #0B2E8A 100%);
-  --grad-hero: linear-gradient(160deg, #CFE9FF 0%, #EAF4FF 55%, #F2F7FD 100%);
-
-  /* Shadows (tinted blue, soft) */
-  --shadow-sm: 0 2px 8px rgba(11, 46, 138, 0.08);
-  --shadow-md: 0 8px 24px rgba(11, 46, 138, 0.12);
-  --shadow-lg: 0 16px 40px rgba(11, 46, 138, 0.20);
-
-  /* Spacing scale */
-  --s1: 4px;
-  --s2: 8px;
-  --s3: 12px;
-  --s4: 16px;
-  --s5: 20px;
-  --s6: 24px;
-  --s8: 32px;
-
-  /* Radius scale */
-  --r-sm: 12px;
-  --r-md: 16px;
-  --r-lg: 24px;
-  --r-pill: 999px;
-
-  /* Typography */
-  --font-ui: 'Noto Sans Thai', 'Sarabun', system-ui, sans-serif;
-  --font-text: 'Sarabun', 'Noto Sans Thai', system-ui, sans-serif;
-
-  /* Layout */
-  --topbar-h: 60px;
-  --nav-h: 64px;
-  --safe-b: env(safe-area-inset-bottom, 0px);
-  --content-w: 1120px;
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-/* ==========================================================
- * 2. BASE / RESET
- * ========================================================== */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-[hidden] {
-  display: none !important;
-}
-
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 15px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
-
-h1,
-h2,
-h3,
-p,
-ul,
-ol,
-figure {
-  margin: 0;
-}
-
-ul,
-ol {
-  padding: 0;
-  list-style: none;
-}
-
-img,
-svg {
-  display: block;
-  max-width: 100%;
-}
-
-button,
-input {
-  font: inherit;
-  color: inherit;
-}
-
-button {
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-a {
-  color: var(--blue);
-  text-decoration: none;
-}
-
-h2,
-h3,
-strong,
-b {
-  color: var(--navy);
-  font-weight: 700;
-}
-
-p,
-.card-text {
-  font-family: var(--font-text);
-}
-
-:focus-visible {
-  outline: 3px solid var(--sky);
-  outline-offset: 2px;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.caption {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-/* ==========================================================
- * 3. APP SHELL
- * ========================================================== */
-
-.app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  min-height: 100dvh;
-}
-
-.view {
-  flex: 1;
-  width: 100%;
-  max-width: var(--content-w);
-  margin: 0 auto;
-  padding: var(--s4) var(--s4) calc(var(--nav-h) + var(--safe-b) + 88px);
-}
-
-.page {
-  display: grid;
-  gap: var(--s4);
-  align-content: start;
-}
-
-.page:not([hidden]) {
-  animation: pageIn 0.25s var(--ease);
-}
-
-.stack {
-  display: grid;
-  gap: var(--s3);
-}
-
-/* Chat page: ล็อกความสูงหน้าจอเพื่อให้ช่องพิมพ์อยู่เหนือ Bottom Nav เสมอ */
-#app[data-current-page="chat"] {
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
-}
-
-#app[data-current-page="chat"] .view {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  padding-bottom: calc(var(--nav-h) + var(--safe-b) + var(--s2));
-}
-
-#app[data-current-page="chat"] .fab-ai {
-  display: none;
-}
-
-/* ==========================================================
- * 4. ICON SYSTEM (Custom SVG sprite - สีควบคุมผ่าน CSS)
- *    sprite ควรใช้ currentColor เป็นเส้นหลัก และ var(--ic-accent) / var(--ic-fill) เป็นสีเสริม
- * ========================================================== */
-
-.ic {
-  --ic-accent: var(--yellow);
-  --ic-fill: var(--sky);
-  flex: none;
-  width: 24px;
-  height: 24px;
-  color: var(--navy);
-}
-
-.ic-sm {
-  width: 18px;
-  height: 18px;
-}
-
-.ic-lg {
-  width: 32px;
-  height: 32px;
-}
-
-.ic-xl {
-  width: 44px;
-  height: 44px;
-}
-
-.btn-primary .ic,
-.btn-icon-round .ic,
-.banner .ic {
-  --ic-accent: var(--yellow);
-  --ic-fill: var(--white);
-  color: var(--white);
-}
-
-/* ==========================================================
- * 5. MASCOT SLOTS (รองรับ PNG/WebP โปร่งใส)
- * ========================================================== */
-
-.mascot-slot {
-  position: relative;
-  flex: none;
-  width: 120px;
-  aspect-ratio: 1 / 1;
-}
-
-.mascot-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center bottom;
-}
-
-.mascot-ph {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  color: var(--sky);
-  opacity: 0.6;
-}
-
-.mascot-img:not([hidden]) ~ .mascot-ph {
-  display: none;
-}
-
-.mascot-xs {
-  width: 36px;
-}
-
-.mascot-avatar {
-  width: 48px;
-  padding: 2px;
-  border-radius: 50%;
-  background: var(--white);
-  border: 2px solid var(--sky);
-  overflow: hidden;
-}
-
-.mascot-fab {
-  width: 100%;
-}
-
-.mascot-sm {
-  width: 96px;
-}
-
-.mascot-md {
-  width: 140px;
-}
-
-.mascot-hero {
-  width: 170px;
-  aspect-ratio: 4 / 5;
-}
-
-.photo-slot {
-  position: relative;
-  overflow: hidden;
-  background: var(--tint);
-}
-
-.photo-slot img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* ==========================================================
- * 6. BUTTONS
- * ========================================================== */
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--s2);
-  min-height: 48px;
-  padding: 0 var(--s5);
-  border: 2px solid transparent;
-  border-radius: var(--r-pill);
-  font-family: var(--font-ui);
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.3;
-  text-align: center;
-  transition: transform 0.15s var(--ease), box-shadow 0.2s, background 0.2s;
-}
-
-.btn:active {
-  transform: scale(0.97);
-}
-
-.btn-primary {
-  background: var(--grad-blue);
-  color: var(--white);
-  box-shadow: 0 6px 16px rgba(21, 101, 255, 0.35);
-}
-
-.btn-secondary {
-  background: var(--yellow);
-  color: var(--navy);
-  box-shadow: 0 6px 16px rgba(255, 198, 41, 0.4);
-}
-
-.btn-outline {
-  background: var(--white);
-  border-color: var(--blue);
-  color: var(--blue);
-}
-
-.btn-sm {
-  min-height: 40px;
-  padding: 0 var(--s4);
-  font-size: 14px;
-}
-
-.btn-block {
-  width: 100%;
-}
-
-.btn-stack {
-  display: grid;
-  gap: var(--s3);
-}
-
-.btn[disabled],
-.btn-send[disabled] {
-  background: var(--line);
-  color: var(--muted);
-  box-shadow: none;
-  cursor: not-allowed;
-}
-
-.icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--tint);
-  transition: background 0.2s, transform 0.15s;
-}
-
-.icon-btn:active {
-  transform: scale(0.94);
-}
-
-.btn-icon-round {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--grad-blue);
-  box-shadow: 0 4px 10px rgba(21, 101, 255, 0.35);
-  transition: transform 0.15s var(--ease);
-}
-
-.btn-icon-round:active {
-  transform: scale(0.92);
-}
-
-.link-btn {
-  display: inline-flex;
-  align-items: center;
-  min-height: 36px;
-  color: var(--blue);
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.link-btn::after {
-  content: "";
-  width: 7px;
-  height: 7px;
-  margin-left: 6px;
-  border: solid currentColor;
-  border-width: 2px 2px 0 0;
-  transform: rotate(45deg);
-}
-
-/* ==========================================================
- * 7. TOPBAR + DESKTOP NAV
- * ========================================================== */
-
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  padding-top: env(safe-area-inset-top, 0px);
-  background: rgba(255, 255, 255, 0.94);
-  border-bottom: 1px solid var(--line);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.topbar-inner {
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  max-width: var(--content-w);
-  height: var(--topbar-h);
-  margin: 0 auto;
-  padding: 0 var(--s4);
-}
-
-.topbar-inner:has(.topbar-title:not([hidden])) .brand {
-  display: none;
-}
-
-.topbar-title {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  font-size: 17px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  flex: none;
-  min-height: 44px;
-}
-
-.brand-img {
-  height: 40px;
-  width: auto;
-  object-fit: contain;
-}
-
-.brand-fallback {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s2);
-}
-
-.brand-fallback .mascot-slot {
-  width: 40px;
-}
-
-.brand-word {
-  display: flex;
-  flex-direction: column;
-  line-height: 1;
-}
-
-.brand-word b {
-  color: var(--navy);
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-.brand-word i {
-  color: var(--yellow);
-  font-size: 13px;
-  font-weight: 800;
-  text-shadow: 0 1px 0 rgba(11, 46, 138, 0.25);
-}
-
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--s2);
-  margin-left: auto;
-}
-
-.topbar-ai span {
-  display: none;
-}
-
-.desktop-nav {
-  display: none;
-}
-
-.desktop-nav button {
-  position: relative;
-  min-height: 44px;
-  padding: 0 var(--s3);
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-  transition: color 0.2s;
-}
-
-.desktop-nav button[aria-current="page"],
-.desktop-nav button.is-active {
-  color: var(--navy);
-}
-
-.desktop-nav button[aria-current="page"]::after,
-.desktop-nav button.is-active::after {
-  content: "";
-  position: absolute;
-  left: var(--s3);
-  right: var(--s3);
-  bottom: 4px;
-  height: 3px;
-  border-radius: var(--r-pill);
-  background: var(--yellow);
-}
-
-/* ==========================================================
- * 8. GLOBAL STATES (Demo banner / Splash / Error / Toast)
- * ========================================================== */
-
-.demo-banner {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--s2);
-  padding: var(--s2) var(--s4);
-  background: var(--warn-bg);
-  border-bottom: 1px solid var(--yellow);
-  color: var(--warn-text);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.demo-banner .ic {
-  margin-top: 2px;
-  color: var(--warn-text);
-}
-
-.demo-banner strong {
-  color: var(--warn-text);
-}
-
-.splash,
-.global-error {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--s4);
-  padding: var(--s6);
-  background: var(--grad-hero);
-  text-align: center;
-}
-
-.global-error {
-  z-index: 190;
-}
-
-.splash p,
-.global-error p {
-  color: var(--muted);
-}
-
-.spinner {
-  width: 36px;
-  height: 36px;
-  border: 4px solid var(--line);
-  border-top-color: var(--blue);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: calc(var(--nav-h) + var(--safe-b) + 92px);
-  z-index: 100;
-  max-width: calc(100% - 32px);
-  padding: var(--s3) var(--s5);
-  border-radius: var(--r-pill);
-  background: var(--navy);
-  color: var(--white);
-  font-size: 14px;
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  transform: translateX(-50%);
-  animation: toastIn 0.25s var(--ease);
-}
-
-/* ==========================================================
- * 9. COMPONENTS: SEARCH / CHIPS / CARDS
- * ========================================================== */
-
-.searchbar {
-  display: flex;
-  align-items: center;
-  gap: var(--s2);
-  min-height: 52px;
-  padding: 0 var(--s2) 0 var(--s4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-  background: var(--white);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-
-.searchbar:focus-within {
-  border-color: var(--sky);
-  box-shadow: 0 0 0 4px rgba(62, 183, 255, 0.25);
-}
-
-.searchbar input,
-.chat-input input {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  font-size: 16px;
-}
-
-.searchbar input::placeholder,
-.chat-input input::placeholder {
-  color: var(--muted);
-}
-
-.chips {
-  display: flex;
-  gap: var(--s2);
-  padding: var(--s1) 2px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.chips::-webkit-scrollbar {
-  display: none;
-}
-
-.chip {
-  flex: none;
-  min-height: 38px;
-  padding: 0 var(--s4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-  background: var(--white);
-  color: var(--navy);
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  transition: background 0.2s, color 0.2s, transform 0.15s;
-}
-
-.chip:active {
-  transform: scale(0.96);
-}
-
-.chip.is-active,
-.chip[aria-pressed="true"],
-.chip-prompt {
-  border-color: transparent;
-  background: var(--grad-blue);
-  color: var(--white);
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 1px 10px;
-  border-radius: var(--r-pill);
-  background: var(--tint);
-  color: var(--blue);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.badge-popular {
-  background: var(--yellow);
-  color: var(--navy);
-}
-
-.card {
-  display: grid;
-  gap: var(--s3);
-  padding: var(--s4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--card);
-  box-shadow: var(--shadow-sm);
-}
-
-.note-card {
-  border-left: 4px solid var(--yellow);
-  white-space: pre-line;
-}
-
-/* Item cards: โครงสร้างที่ Scripts ต้องสร้าง
- * .program-card / .news-card / .contact-card > .card-img + .card-body(.card-title .card-text .card-meta) */
-.program-card,
-.news-card,
-.contact-card {
-  display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
-  gap: var(--s3);
-  align-items: center;
-  width: 100%;
-  padding: var(--s2);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--card);
-  box-shadow: var(--shadow-sm);
-  color: inherit;
-  text-align: left;
-  transition: transform 0.2s var(--ease), box-shadow 0.2s;
-}
-
-.contact-card {
-  grid-template-columns: 44px minmax(0, 1fr);
-  padding: var(--s3) var(--s4);
-}
-
-.program-card:active,
-.news-card:active {
-  transform: scale(0.985);
-}
-
-.card-img {
-  position: relative;
-  width: 96px;
-  height: 84px;
-  border-radius: var(--r-sm);
-  background: var(--tint);
-  overflow: hidden;
-}
-
-.card-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.card-ico {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--tint);
-}
-
-.card-body {
-  min-width: 0;
-}
-
-.card-title {
-  color: var(--navy);
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
-
-.card-text {
-  display: -webkit-box;
-  overflow: hidden;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.5;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow-wrap: anywhere;
-}
-
-.card-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--s2);
-  margin-top: var(--s1);
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.hscroll {
-  display: flex;
-  gap: var(--s3);
-  margin: 0 calc(var(--s4) * -1);
-  padding: var(--s1) var(--s4) var(--s3);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-}
-
-.hscroll::-webkit-scrollbar {
-  display: none;
-}
-
-.hscroll > * {
-  flex: 0 0 min(300px, 82%);
-  scroll-snap-align: start;
-}
-
-.section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s3);
-}
-
-.section-head h3 {
-  font-size: 18px;
-}
-
-/* ==========================================================
- * 10. HOME
- * ========================================================== */
-
-.hero {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--s2);
-  min-height: 230px;
-  padding: var(--s5) var(--s4) 0 var(--s5);
-  border-radius: var(--r-lg);
-  background: var(--grad-hero);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-}
-
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  opacity: 0.3;
-  background: transparent;
-}
-
-.hero-copy {
-  position: relative;
-  z-index: 1;
-  align-self: center;
-  min-width: 0;
-  padding-bottom: var(--s5);
-}
-
-.hero-hello {
-  display: inline-block;
-  margin-bottom: var(--s2);
-  padding: 2px 14px;
-  border-radius: var(--r-pill);
-  background: var(--yellow);
-  color: var(--navy);
-  font-weight: 700;
-  font-size: 13px;
-}
-
-.hero-title {
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1.3;
-}
-
-.hero-sub {
-  margin-top: var(--s2);
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.hero-cta {
-  margin-top: var(--s4);
-}
-
-.hero .mascot-hero {
-  position: relative;
-  z-index: 1;
-  margin-right: -4px;
-}
-
-.quick-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--s3);
-}
-
-.quick {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--s2);
-  min-height: 96px;
-  padding: var(--s4) var(--s2);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--white);
-  box-shadow: var(--shadow-sm);
-  color: var(--navy);
-  font-size: 13px;
-  font-weight: 700;
-  transition: transform 0.2s var(--ease), box-shadow 0.2s;
-}
-
-.quick:active {
-  transform: scale(0.96);
-}
-
-.banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s3);
-  width: 100%;
-  padding: var(--s4) var(--s4) var(--s4) var(--s5);
-  border-radius: var(--r-lg);
-  background: var(--grad-blue);
-  box-shadow: var(--shadow-md);
-  color: var(--white);
-  text-align: left;
-  overflow: hidden;
-}
-
-.banner-text {
-  display: grid;
-  gap: var(--s1);
-  min-width: 0;
-}
-
-.banner-text strong {
-  color: var(--white);
-  font-size: 19px;
-}
-
-.banner-text small {
-  color: #CFE9FF;
-  font-size: 13px;
-}
-
-.banner .mascot-slot {
-  margin: calc(var(--s4) * -1) 0 calc(var(--s4) * -1);
-}
-
-.cta-ask {
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  padding: var(--s4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--tint);
-}
-
-.cta-ask > div {
-  display: grid;
-  gap: var(--s3);
-  justify-items: start;
-  min-width: 0;
-}
-
-.pillars {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--s3);
-}
-
-.pillars li {
-  display: grid;
-  justify-items: center;
-  gap: 2px;
-  padding: var(--s4) var(--s2);
-  border-radius: var(--r-md);
-  background: var(--white);
-  border: 1px solid var(--line);
-  text-align: center;
-}
-
-.pillars b {
-  font-size: 14px;
-}
-
-.pillars small {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-/* ==========================================================
- * 11. CHAT (AI Chatbot)
- * ========================================================== */
-
-.page.page-chat {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: var(--s2);
-  min-height: 0;
-}
-
-.chat-head {
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  padding: var(--s3) var(--s4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--white);
-  box-shadow: var(--shadow-sm);
-}
-
-.chat-head strong {
-  display: block;
-  line-height: 1.3;
-}
-
-.status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--ok);
-}
-
-.chat-log {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: var(--s3);
-  min-height: 0;
-  padding: var(--s2) 2px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
-
-/* Message structure: .msg.msg-bot|.msg-user > (.mascot-avatar) + .bubble-wrap > .bubble + .msg-time */
-.msg {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--s2);
-  max-width: 90%;
-  animation: msgIn 0.25s var(--ease);
-}
-
-.msg-user {
-  flex-direction: row-reverse;
-  align-self: flex-end;
-}
-
-.msg .mascot-avatar {
-  width: 36px;
-}
-
-.bubble-wrap {
-  display: grid;
-  gap: var(--s1);
-  min-width: 0;
-}
-
-.bubble {
-  padding: 10px 14px;
-  border-radius: 18px;
-  font-family: var(--font-text);
-  font-size: 15px;
-  line-height: 1.55;
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
-}
-
-.msg-bot .bubble {
-  border: 1px solid var(--line);
-  border-bottom-left-radius: 6px;
-  background: var(--white);
-  box-shadow: var(--shadow-sm);
-}
-
-.msg-user .bubble {
-  border-bottom-right-radius: 6px;
-  background: var(--grad-blue);
-  color: var(--white);
-}
-
-.msg-time {
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.msg-user .msg-time {
-  text-align: right;
-}
-
-.typing {
-  display: inline-flex;
-  gap: 5px;
-  padding: 14px 16px;
-}
-
-.typing i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--sky);
-  animation: typing 1.2s infinite ease-in-out;
-}
-
-.typing i:nth-child(2) {
-  animation-delay: 0.15s;
-}
-
-.typing i:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-.related-list {
-  display: grid;
-  gap: var(--s2);
-  margin-top: var(--s1);
-}
-
-.chat-suggest {
-  display: flex;
-  gap: var(--s2);
-  padding: var(--s1) 2px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.chat-suggest::-webkit-scrollbar {
-  display: none;
-}
-
-.chat-input {
-  display: flex;
-  align-items: center;
-  gap: var(--s2);
-  min-height: 56px;
-  padding: 6px 8px 6px var(--s4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-  background: var(--white);
-  box-shadow: var(--shadow-md);
-}
-
-.chat-input:focus-within {
-  border-color: var(--sky);
-}
-
-.btn-send {
-  width: 44px;
-  height: 44px;
-}
-
-/* ==========================================================
- * 12. PAGE HEROES, PROGRAMS, CAREER, ADMISSIONS
- * ========================================================== */
-
-.page-hero {
-  display: flex;
-  align-items: center;
-  gap: var(--s4);
-  padding: var(--s5);
-  border-radius: var(--r-lg);
-  background: var(--grad-hero);
-  box-shadow: var(--shadow-sm);
-}
-
-.page-hero > div {
-  min-width: 0;
-}
-
-.page-hero h2 {
-  font-size: 21px;
-  font-weight: 800;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
-
-.page-hero p {
-  color: var(--muted);
-  font-size: 14px;
-  overflow-wrap: anywhere;
-}
-
-.page-hero-icon {
-  flex: none;
-  width: 60px;
-  height: 60px;
-  padding: 12px;
-  border-radius: 20px;
-  background: var(--white);
-  box-shadow: var(--shadow-sm);
-  color: var(--navy);
-  --ic-accent: var(--yellow);
-  --ic-fill: var(--sky);
-}
-
-.page-hero-tall {
-  justify-content: space-between;
-  padding-bottom: var(--s4);
-}
-
-.hero-lead {
-  display: block;
-  margin-top: var(--s2);
-  color: var(--blue);
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-.menu-list {
-  display: grid;
-  gap: var(--s3);
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  width: 100%;
-  min-height: 60px;
-  padding: var(--s3) var(--s4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--white);
-  box-shadow: var(--shadow-sm);
-  color: var(--navy);
-  font-size: 15px;
-  font-weight: 600;
-  text-align: left;
-  transition: transform 0.2s var(--ease), box-shadow 0.2s;
-}
-
-button.menu-item::after {
-  content: "";
-  flex: none;
-  width: 8px;
-  height: 8px;
-  margin-left: auto;
-  border: solid var(--muted);
-  border-width: 2px 2px 0 0;
-  transform: rotate(45deg);
-}
-
-button.menu-item:active {
-  transform: scale(0.985);
-}
-
-.menu-ico {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--tint);
-}
-
-/* More: เมนูแบบการ์ดไอคอน */
-.page[data-page="more"] .menu-list {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.page[data-page="more"] .menu-item {
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--s2);
-  min-height: 124px;
-  padding: var(--s4) var(--s2);
-  font-size: 14px;
-  text-align: center;
-}
-
-.page[data-page="more"] .menu-item::after {
-  display: none;
-}
-
-.page[data-page="more"] .menu-ico {
-  width: 56px;
-  height: 56px;
-}
-
-/* Career flow: .option = ตัวเลือกคำตอบ, .is-selected = ที่เลือก */
-.progress {
-  height: 8px;
-  border-radius: var(--r-pill);
-  background: var(--tint);
-  overflow: hidden;
-}
-
-.progress i {
-  display: block;
-  width: 0;
-  height: 100%;
-  border-radius: var(--r-pill);
-  background: linear-gradient(90deg, var(--sky), var(--blue));
-  transition: width 0.4s var(--ease);
-}
-
-.career-flow h3 {
-  font-size: 18px;
-  line-height: 1.45;
-}
-
-.option-list {
-  display: grid;
-  gap: var(--s3);
-}
-
-.option {
-  min-height: 52px;
-  padding: var(--s3) var(--s4);
-  border: 2px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--white);
-  color: var(--text);
-  font-weight: 600;
-  text-align: left;
-  transition: border-color 0.2s, background 0.2s, transform 0.15s;
-}
-
-.option:active {
-  transform: scale(0.985);
-}
-
-.option.is-selected {
-  border-color: var(--blue);
-  background: var(--tint);
-}
-
-.career-result h3 {
-  font-size: 19px;
-}
-
-/* Admissions stepper */
-.steps {
-  display: grid;
-  gap: var(--s3);
-}
-
-.step {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--s4);
-  padding: var(--s3) var(--s4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--white);
-  box-shadow: var(--shadow-sm);
-}
-
-.step:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 36px;
-  width: 3px;
-  height: var(--s3);
-  background: var(--sky);
-}
-
-.step-no {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--grad-blue);
-  color: var(--white);
-  font-size: 17px;
-  font-weight: 800;
-}
-
-/* ==========================================================
- * 13. PARENT / ABOUT / CONTACT / SHEET
- * ========================================================== */
-
-.parent-hero {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  min-height: 190px;
-  border-radius: var(--r-lg);
-  background: var(--grad-blue);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-}
-
-.parent-photo {
-  position: absolute;
-  inset: 0;
-  background: transparent;
-}
-
-.parent-hero-text {
-  position: relative;
-  width: 100%;
-  padding: var(--s8) var(--s5) var(--s4);
-  background: linear-gradient(to top, rgba(11, 46, 138, 0.9), rgba(11, 46, 138, 0));
-}
-
-.parent-hero-text h2,
-.parent-hero-text p {
-  color: var(--white);
-}
-
-.slogan {
-  color: var(--navy);
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.5;
-  text-align: center;
-  text-wrap: balance;
-}
-
-.about-meta {
-  text-align: center;
-}
-
-.map-card {
-  padding: 0;
-  overflow: hidden;
-}
-
-.map-box {
-  aspect-ratio: 16 / 9;
-  background: var(--tint);
-}
-
-.map-box iframe,
-.map-box img {
-  width: 100%;
-  height: 100%;
-  border: 0;
-  object-fit: cover;
-}
-
-.sheet-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  background: rgba(11, 46, 138, 0.45);
-  animation: fadeIn 0.2s;
-}
-
-.sheet {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 90;
-  max-height: 86vh;
-  max-height: 86dvh;
-  padding: var(--s3) var(--s5) calc(var(--s6) + var(--safe-b));
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
-  background: var(--white);
-  box-shadow: var(--shadow-lg);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  animation: sheetIn 0.3s var(--ease);
-}
-
-.sheet-handle {
-  width: 40px;
-  height: 4px;
-  margin: 0 auto var(--s3);
-  border-radius: var(--r-pill);
-  background: var(--line);
-}
-
-.sheet-close {
-  position: absolute;
-  top: var(--s3);
-  right: var(--s3);
-}
-
-#sheetBody {
-  display: grid;
-  gap: var(--s3);
-}
-
-#sheetBody h2,
-#sheetBody h3 {
-  padding-right: 48px;
-  font-size: 20px;
-}
-
-#sheetBody p {
-  white-space: pre-line;
-}
-
-/* ==========================================================
- * 14. BOTTOM NAV + FLOATING AI
- * ========================================================== */
-
-.bottom-nav {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 55;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  height: calc(var(--nav-h) + var(--safe-b));
-  padding-bottom: var(--safe-b);
-  border-radius: 20px 20px 0 0;
-  background: var(--white);
-  box-shadow: 0 -6px 20px rgba(11, 46, 138, 0.1);
-}
-
-.bottom-nav button {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  min-width: 0;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-.bottom-nav .ic {
-  width: 26px;
-  height: 26px;
-  color: var(--muted);
-  --ic-accent: #B7C6E0;
-  --ic-fill: #D5E1F3;
-}
-
-.bottom-nav button[aria-current="page"],
-.bottom-nav button.is-active {
-  color: var(--navy);
-}
-
-.bottom-nav button[aria-current="page"] .ic,
-.bottom-nav button.is-active .ic {
-  color: var(--navy);
-  --ic-accent: var(--yellow);
-  --ic-fill: var(--sky);
-}
-
-.bottom-nav button[aria-current="page"]::before,
-.bottom-nav button.is-active::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  width: 28px;
-  height: 4px;
-  border-radius: 0 0 var(--r-pill) var(--r-pill);
-  background: var(--yellow);
-}
-
-.fab-ai {
-  position: fixed;
-  right: var(--s4);
-  bottom: calc(var(--nav-h) + var(--safe-b) + var(--s4));
-  z-index: 60;
-  width: 64px;
-  height: 64px;
-  padding: 6px;
-  border: 3px solid var(--sky);
-  border-radius: 50%;
-  background: var(--white);
-  box-shadow: var(--shadow-lg);
-  transition: transform 0.2s var(--ease);
-}
-
-.fab-ai:active {
-  transform: scale(0.94);
-}
-
-.fab-tag {
-  position: absolute;
-  left: 50%;
-  bottom: -8px;
-  padding: 0 9px;
-  border-radius: var(--r-pill);
-  background: var(--grad-blue);
-  color: var(--white);
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 18px;
-  transform: translateX(-50%);
-}
-
-/* ==========================================================
- * 15. STATES: Empty / Error / Skeleton
- * ========================================================== */
-
-.state {
-  display: grid;
-  justify-items: center;
-  gap: var(--s2);
-  padding: var(--s8) var(--s4);
-  text-align: center;
-}
-
-.state p {
-  max-width: 36ch;
-  color: var(--muted);
-}
-
-.state .btn {
-  margin-top: var(--s2);
-}
-
-.state-error h3 {
-  color: var(--danger);
-}
-
-.skeleton-list {
-  display: grid;
-  gap: var(--s3);
-}
-
-.skeleton-card {
-  height: 96px;
-  border-radius: var(--r-md);
-  background: linear-gradient(90deg, #E3ECF8 25%, #F4F8FD 40%, #E3ECF8 60%);
-  background-size: 300% 100%;
-  animation: shimmer 1.4s infinite linear;
-}
-
-/* ==========================================================
- * 16. ANIMATIONS
- * ========================================================== */
-
-@keyframes pageIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes msgIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes typing {
-  0%,
-  60%,
-  100% {
-    opacity: 0.4;
-    transform: translateY(0);
-  }
-
-  30% {
-    opacity: 1;
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes shimmer {
-  from {
-    background-position: 100% 0;
-  }
-
-  to {
-    background-position: -100% 0;
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes sheetIn {
-  from {
-    transform: translateY(40px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes toastIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 12px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
-/* ==========================================================
- * 17. RESPONSIVE
- * ========================================================== */
-
-/* Mobile เล็กมาก (320px) */
-@media (max-width: 359px) {
-  .hero-title {
-    font-size: 22px;
-  }
-
-  .mascot-hero {
-    width: 130px;
-  }
-
-  .quick-grid {
-    gap: var(--s2);
-  }
-
-  .quick {
-    font-size: 12px;
-  }
-}
-
-/* ขณะพิมพ์ในแชทบนมือถือ ซ่อน Bottom Nav เพื่อให้ช่องพิมพ์เห็นชัด */
-@media (max-width: 1023px) {
-  #app[data-current-page="chat"]:has(#chatInput:focus) .bottom-nav {
-    display: none;
-  }
-
-  #app[data-current-page="chat"]:has(#chatInput:focus) .view {
-    padding-bottom: calc(var(--safe-b) + var(--s2));
-  }
-}
-
-/* ข้อความบนปุ่ม AI แสดงเมื่อกว้างพอ */
-@media (min-width: 480px) {
-  .topbar-ai span {
-    display: inline;
-  }
-}
-
-/* Tablet 768-1023 */
-@media (min-width: 768px) {
-  .view {
-    padding-left: var(--s6);
-    padding-right: var(--s6);
-  }
-
-  .hscroll {
-    margin: 0 calc(var(--s6) * -1);
-    padding-left: var(--s6);
-    padding-right: var(--s6);
-  }
-
-  .hero {
-    min-height: 300px;
-    padding: var(--s8) var(--s8) 0;
-  }
-
-  .hero-title {
-    font-size: 34px;
-  }
-
-  .mascot-hero {
-    width: 250px;
-  }
-
-  .stack {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .quick-grid {
-    grid-template-columns: repeat(6, 1fr);
-  }
-
-  .pillars {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .steps {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .step {
-    flex-direction: column;
-    gap: var(--s2);
-    text-align: center;
-  }
-
-  .step:not(:last-child)::after {
-    top: 38px;
-    left: 100%;
-    width: var(--s3);
-    height: 3px;
-  }
-
-  .btn-stack {
-    max-width: 480px;
-  }
-
-  .page[data-page="more"] .menu-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .chips {
-    flex-wrap: wrap;
-    overflow: visible;
-  }
-
-  .sheet {
-    left: 50%;
-    right: auto;
-    bottom: var(--s6);
-    width: min(560px, calc(100% - 48px));
-    border-radius: var(--r-lg);
-    transform: translateX(-50%);
-    animation: sheetInCenter 0.3s var(--ease);
-  }
-
-  .toast {
-    bottom: calc(var(--nav-h) + var(--safe-b) + 92px);
-  }
-}
-
-@keyframes sheetInCenter {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 24px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
-/* Desktop 1024+ */
-@media (min-width: 1024px) {
-  .view {
-    padding-top: var(--s6);
-    padding-bottom: var(--s8);
-  }
-
-  .desktop-nav {
-    display: flex;
-    flex: 1;
-    justify-content: center;
-    gap: var(--s1);
-  }
-
-  .topbar-actions {
-    margin-left: 0;
-  }
-
-  .mobile-only,
-  .bottom-nav {
-    display: none;
-  }
-
-  .topbar-title {
-    display: none;
-  }
-
-  .hero {
-    min-height: 380px;
-    padding: 48px 56px 0;
-  }
-
-  .hero-title {
-    font-size: 46px;
-  }
-
-  .hero-sub {
-    font-size: 18px;
-  }
-
-  .mascot-hero {
-    width: 340px;
-  }
-
-  .stack {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .hscroll > * {
-    flex-basis: 320px;
-  }
-
-  .fab-ai {
-    right: var(--s6);
-    bottom: var(--s6);
-  }
-
-  .toast {
-    bottom: var(--s6);
-  }
-
-  .page-hero {
-    padding: var(--s6) var(--s8);
-  }
-
-  .page-hero h2 {
-    font-size: 26px;
-  }
-
-  .page[data-page="more"] .menu-list {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  /* Chat บน Desktop: กรอบกลางหน้าจอ */
-  #app[data-current-page="chat"] .view {
-    max-width: 800px;
-    padding-bottom: var(--s6);
-  }
-
-  .page[data-page="contact"] .stack,
-  .page[data-page="news"] .stack {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .menu-list {
-    max-width: 720px;
-  }
-
-  .page[data-page="more"] .menu-list {
-    max-width: none;
-  }
-}
-
-/* Hover เฉพาะอุปกรณ์ที่มีเมาส์ */
-@media (hover: hover) {
-  .btn-primary:hover {
-    box-shadow: 0 10px 22px rgba(21, 101, 255, 0.45);
-    transform: translateY(-2px);
-  }
-
-  .btn-secondary:hover {
-    box-shadow: 0 10px 22px rgba(255, 198, 41, 0.55);
-    transform: translateY(-2px);
-  }
-
-  .btn-outline:hover {
-    background: var(--tint);
-  }
-
-  .icon-btn:hover,
-  .chip:hover {
-    background: var(--tint);
-  }
-
-  .chip.is-active:hover,
-  .chip-prompt:hover {
-    background: var(--grad-blue);
-  }
-
-  .program-card:hover,
-  .news-card:hover,
-  .quick:hover,
-  .menu-item:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-  }
-
-  .desktop-nav button:hover {
-    color: var(--navy);
-  }
-
-  .option:hover {
-    border-color: var(--sky);
-  }
-
-  .fab-ai:hover {
-    transform: translateY(-3px);
-  }
-}
-
-/* ==========================================================
- * 18. REDUCED MOTION
- * ========================================================== */
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* ==========================================================
- * 19. CAREER MATCH RESULT + SHARE CARD PREVIEW
- * ========================================================== */
-
-.career-card-preview {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  max-width: 420px;
-  min-height: 240px;
-  margin: 0 auto;
-  border-radius: var(--r-md);
-  background: var(--tint);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-}
-
-.career-card-preview img {
-  width: 100%;
-  height: auto;
-}
-
-.score-row {
-  display: grid;
-  gap: var(--s1);
-}
-
-.score-row .caption {
-  display: flex;
-  justify-content: space-between;
-}
+(function () {
+  'use strict';
+
+  // กัน Boot ซ้ำ หากไฟล์นี้ถูกโหลดมากกว่าหนึ่งครั้ง
+  if (window.__NICC_APP__) {
+    return;
+  }
+  window.__NICC_APP__ = true;
+
+  /* ==========================================================
+   * 1. CONSTANTS & STATE
+   * ========================================================== */
+
+  // วาง URL ของ Google Apps Script Web App ที่ Deploy แล้วตรงนี้ (ลงท้ายด้วย /exec)
+  const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYCLZvxX8R-E0R2H0t2P7w7uG2Pjw1JTxFOxigtsAGWAP4Ho/exec';
+
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const PAGES = ['home', 'chat', 'programs', 'career', 'admissions', 'parent', 'news', 'about', 'contact', 'more'];
+  const BOTTOM_NAV_KEYS = ['home', 'chat', 'programs', 'news', 'more'];
+  const MAX_MESSAGES = 100;
+  const AI_TIMEOUT_MS = 45000;
+  const BOOT_TIMEOUT_MS = 40000;
+
+  // คีย์ใน Settings ที่ใช้เก็บ URL ภาพมาสคอตแต่ละท่า (ไม่มี = ใช้ mascotImageUrl)
+  const MASCOT_KEYS = {
+    head: 'mascotHeadUrl',
+    wave: 'mascotWaveUrl',
+    point: 'mascotPointUrl',
+    tablet: 'mascotTabletUrl',
+    idea: 'mascotIdeaUrl',
+    cheer: 'mascotCheerUrl'
+  };
+
+  const PHOTO_KEYS = {
+    campus: 'campusImageUrl',
+    parent: 'parentImageUrl'
+  };
+
+  const CONTACT_ICONS = {
+    phone: 'i-contact',
+    email: 'i-mail',
+    address: 'i-map',
+    hours: 'i-calendar',
+    facebook: 'i-globe',
+    line: 'i-globe',
+    website: 'i-globe'
+  };
+
+  const state = {
+    loading: false,
+    booted: false,
+    page: '',
+    navStack: [],
+    settings: {},
+    sources: {},
+    config: {},
+    programs: [],
+    news: [],
+    contacts: [],
+    programQuery: '',
+    programCategory: '',
+    busy: false,
+    requestId: 0,
+    lastQuestion: '',
+    sessionId: '',
+    sheetTrigger: null,
+    toastTimer: 0,
+    career: { questions: [], types: [], index: 0, answers: {}, busy: false, result: null, cardBlob: null, cardUrl: '' }
+  };
+
+  /* ==========================================================
+   * 2. DOM & DATA HELPERS (ไม่ใช้ innerHTML กับข้อมูลภายนอก)
+   * ========================================================== */
+
+  function byId(id) {
+    return document.getElementById(id);
+  }
+
+  function isObject(value) {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  function toText(value) {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    return String(value).trim();
+  }
+
+  function clearNode(node) {
+    if (!node) {
+      return;
+    }
+    while (node.firstChild) {
+      node.removeChild(node.firstChild);
+    }
+    node.removeAttribute('aria-busy');
+  }
+
+  function el(tag, options, children) {
+    const node = document.createElement(tag);
+    const opts = options || {};
+    if (opts.className) {
+      node.className = opts.className;
+    }
+    if (opts.text !== undefined) {
+      node.textContent = opts.text;
+    }
+    if (opts.attrs) {
+      Object.keys(opts.attrs).forEach(function (name) {
+        node.setAttribute(name, opts.attrs[name]);
+      });
+    }
+    (children || []).forEach(function (child) {
+      if (child) {
+        node.appendChild(child);
+      }
+    });
+    return node;
+  }
+
+  // ไอคอนจาก SVG sprite ของ NICC (SvgIcons.html)
+  function svgUse(symbolId, className) {
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    const use = document.createElementNS(SVG_NS, 'use');
+    svg.setAttribute('class', className || 'ic');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+    use.setAttribute('href', '#' + symbolId);
+    svg.appendChild(use);
+    return svg;
+  }
+
+  // รับเฉพาะ https เพราะหน้าเว็บเป็น https (กัน mixed content และ javascript:)
+  function httpsUrl(value) {
+    const text = toText(value);
+    return /^https:\/\//i.test(text) ? text : '';
+  }
+
+  function safeContactHref(value) {
+    const href = toText(value);
+    if (/^tel:\+?[0-9]{5,15}$/.test(href)) {
+      return href;
+    }
+    if (/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/.test(href)) {
+      return href;
+    }
+    return httpsUrl(href);
+  }
+
+  function pad(number) {
+    return number < 10 ? '0' + number : String(number);
+  }
+
+  function nowTime() {
+    const now = new Date();
+    return pad(now.getHours()) + ':' + pad(now.getMinutes());
+  }
+
+  function isMock(sourceKey) {
+    return state.sources[sourceKey] === 'mock';
+  }
+
+  function isDesktop() {
+    return window.matchMedia('(min-width: 1024px)').matches;
+  }
+
+  /* ==========================================================
+   * 3. SERVER BRIDGE (GitHub Pages -> Google Apps Script API)
+   * ========================================================== */
+
+  function callServer(functionName, args, onSuccess, onFailure) {
+    // กรณีรันอยู่บน Google Apps Script โดยตรง ยังรองรับ google.script.run
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      try {
+        const runner = google.script.run
+          .withSuccessHandler(onSuccess)
+          .withFailureHandler(onFailure);
+        runner[functionName].apply(runner, args);
+      } catch (error) {
+        onFailure(error);
+      }
+      return;
+    }
+
+    // กรณีรันอยู่บน GitHub Pages เรียกผ่าน fetch() ไปยัง Google Apps Script Web App
+    if (!GAS_API_URL || GAS_API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+      onFailure('กรุณาใส่ลิงก์ Web App URL ของ Google Apps Script ในตัวแปร GAS_API_URL ในไฟล์ scripts.js ก่อนครับ');
+      return;
+    }
+
+    fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify({
+        fn: functionName,
+        args: Array.isArray(args) ? args : []
+      })
+    })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status);
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        onSuccess(data);
+      })
+      .catch(function (error) {
+        onFailure(error);
+      });
+  }
+
+  /* ==========================================================
+   * 4. NORMALIZERS (ตรวจโครงสร้างข้อมูลก่อน render)
+   * ========================================================== */
+
+  function normalizeProgram(raw, index) {
+    if (!isObject(raw) || !toText(raw.name)) {
+      return null;
+    }
+    return {
+      id: toText(raw.id) || 'p' + index,
+      name: toText(raw.name),
+      category: toText(raw.category),
+      level: toText(raw.level),
+      description: toText(raw.description),
+      careers: Array.isArray(raw.careers) ? raw.careers.map(toText).filter(Boolean) : [],
+      imageUrl: httpsUrl(raw.imageUrl),
+      duration: toText(raw.duration),
+      popular: raw.popular === true
+    };
+  }
+
+  function normalizeNews(raw, index) {
+    if (!isObject(raw) || !toText(raw.title)) {
+      return null;
+    }
+    return {
+      id: toText(raw.id) || 'n' + index,
+      title: toText(raw.title),
+      dateText: toText(raw.dateText),
+      category: toText(raw.category),
+      summary: toText(raw.summary),
+      imageUrl: httpsUrl(raw.imageUrl),
+      linkUrl: httpsUrl(raw.linkUrl)
+    };
+  }
+
+  function normalizeContact(raw, index) {
+    if (!isObject(raw) || !toText(raw.type) || !toText(raw.value)) {
+      return null;
+    }
+    return {
+      id: toText(raw.id) || 'c' + index,
+      type: toText(raw.type).toLowerCase(),
+      label: toText(raw.label),
+      value: toText(raw.value),
+      note: toText(raw.note),
+      href: safeContactHref(raw.href)
+    };
+  }
+
+  function normalizeCareerQuestion(raw, index) {
+    if (!isObject(raw) || !toText(raw.text) || !toText(raw.type)) {
+      return null;
+    }
+    return { id: toText(raw.id) || 'q' + index, type: toText(raw.type), text: toText(raw.text) };
+  }
+
+  function normalizeCareerType(raw) {
+    if (!isObject(raw) || !toText(raw.code)) {
+      return null;
+    }
+    return { code: toText(raw.code), nameTh: toText(raw.nameTh), title: toText(raw.title) };
+  }
+
+  function toList(value, normalizer) {
+    return (Array.isArray(value) ? value : []).map(normalizer).filter(Boolean);
+  }
+
+  /* ==========================================================
+   * 5. BRAND ASSETS (มาสคอต โลโก้ ภาพถ่าย จาก Settings)
+   * ========================================================== */
+
+  function applyMascots(root) {
+    const scope = root || document;
+    scope.querySelectorAll('[data-mascot]').forEach(function (slot) {
+      const img = slot.querySelector('.mascot-img');
+      if (!img) {
+        return;
+      }
+      const pose = slot.getAttribute('data-mascot');
+      const url = httpsUrl(state.settings[MASCOT_KEYS[pose]]) || httpsUrl(state.settings.mascotImageUrl);
+      if (!url || img.getAttribute('src') === url) {
+        return;
+      }
+      img.onload = function () {
+        img.hidden = false;
+      };
+      img.onerror = function () {
+        img.hidden = true;
+        img.removeAttribute('src');
+      };
+      img.src = url;
+    });
+  }
+
+  function applyPhotos() {
+    document.querySelectorAll('[data-photo]').forEach(function (slot) {
+      const img = slot.querySelector('img');
+      const url = httpsUrl(state.settings[PHOTO_KEYS[slot.getAttribute('data-photo')]]);
+      if (!img || !url) {
+        return;
+      }
+      img.onload = function () {
+        img.hidden = false;
+      };
+      img.onerror = function () {
+        img.hidden = true;
+      };
+      img.src = url;
+    });
+  }
+
+  function applyBrand() {
+    const img = byId('brandImg');
+    const fallback = byId('brandFallback');
+    const url = httpsUrl(state.settings.logoUrl);
+    if (!img || !fallback || !url) {
+      return;
+    }
+    img.onload = function () {
+      img.hidden = false;
+      fallback.hidden = true;
+    };
+    img.onerror = function () {
+      img.hidden = true;
+      fallback.hidden = false;
+    };
+    img.src = url;
+  }
+
+  // ผูกข้อความจาก Settings กับ [data-bind] (ไม่มีค่า = คงข้อความเริ่มต้นไว้ หรือซ่อนถ้ามี data-hide-empty)
+  function applyBindings() {
+    document.querySelectorAll('[data-bind]').forEach(function (node) {
+      const value = toText(state.settings[node.getAttribute('data-bind')]);
+      const hideWhenEmpty = node.hasAttribute('data-hide-empty');
+      if (value) {
+        node.textContent = value;
+        if (hideWhenEmpty) {
+          node.hidden = false;
+        }
+      } else if (hideWhenEmpty) {
+        node.hidden = true;
+      }
+    });
+  }
+
+  function applySourceStatus() {
+    const values = Object.keys(state.sources).map(function (key) {
+      return state.sources[key];
+    });
+    const mockCount = values.filter(function (value) {
+      return value === 'mock';
+    }).length;
+
+    const banner = byId('demoBanner');
+    if (banner) {
+      banner.hidden = mockCount === 0;
+    }
+
+    const version = byId('appVersion');
+    if (version && toText(state.config.version)) {
+      version.textContent = 'v' + toText(state.config.version);
+    }
+
+    const source = byId('dataSource');
+    if (source) {
+      if (mockCount === 0) {
+        source.textContent = '· ข้อมูลจาก Google Sheets';
+      } else if (mockCount === values.length) {
+        source.textContent = '· ข้อมูลตัวอย่างทั้งหมด';
+      } else {
+        source.textContent = '· บางส่วนเป็นข้อมูลตัวอย่าง';
+      }
+    }
+  }
+
+  /* ==========================================================
+   * 6. STATES (Loading / Empty / Error) จาก <template> ใน Index.html
+   * ========================================================== */
+
+  function cloneTemplate(templateId) {
+    const template = byId(templateId);
+    return template && template.content ? template.content.cloneNode(true) : null;
+  }
+
+  function showLoading(container) {
+    if (!container) {
+      return;
+    }
+    clearNode(container);
+    const fragment = cloneTemplate('tplLoading');
+    if (fragment) {
+      container.appendChild(fragment);
+      container.setAttribute('aria-busy', 'true');
+    }
+  }
+
+  function renderState(container, kind, config) {
+    if (!container) {
+      return;
+    }
+    clearNode(container);
+    const fragment = cloneTemplate(kind === 'error' ? 'tplError' : 'tplEmpty');
+    if (!fragment) {
+      return;
+    }
+    const node = fragment.firstElementChild;
+    const options = config || {};
+
+    function setSlot(slot, value) {
+      const target = node.querySelector('[data-slot="' + slot + '"]');
+      if (target && value !== undefined) {
+        target.textContent = value;
+      }
+    }
+
+    setSlot('title', options.title);
+    setSlot('text', options.text);
+
+    const action = node.querySelector('[data-slot="action"]');
+    if (action) {
+      if (options.actionLabel) {
+        action.textContent = options.actionLabel;
+        action.hidden = false;
+        Object.keys(options.actionAttrs || {}).forEach(function (name) {
+          action.setAttribute(name, options.actionAttrs[name]);
+        });
+      } else if (kind === 'error') {
+        action.setAttribute('data-action', 'retry-bootstrap');
+      } else {
+        action.hidden = true;
+      }
+    }
+
+    node.style.gridColumn = '1 / -1';
+    applyMascots(node);
+    container.appendChild(node);
+  }
+
+  function setSplash(visible) {
+    const splash = byId('splash');
+    if (splash) {
+      splash.hidden = !visible;
+    }
+  }
+
+  function setGlobalError(visible, message) {
+    const box = byId('globalError');
+    const text = byId('globalErrorText');
+    if (text && message) {
+      text.textContent = message;
+    }
+    if (box) {
+      box.hidden = !visible;
+    }
+  }
+
+  function showToast(message) {
+    const toast = byId('toast');
+    if (!toast) {
+      return;
+    }
+    window.clearTimeout(state.toastTimer);
+    toast.hidden = true;
+    toast.textContent = message;
+    void toast.offsetWidth;
+    toast.hidden = false;
+    state.toastTimer = window.setTimeout(function () {
+      toast.hidden = true;
+    }, 3500);
+  }
+
+  /* ==========================================================
+   * 7. ROUTING & NAVIGATION
+   * ========================================================== */
+
+  function updateNav(page) {
+    const bottomActive = BOTTOM_NAV_KEYS.indexOf(page) >= 0 ? page : 'more';
+    document.querySelectorAll('[data-nav]').forEach(function (button) {
+      const key = button.getAttribute('data-nav');
+      const inBottomNav = Boolean(button.closest('#bottomNav'));
+      const active = inBottomNav ? key === bottomActive : key === page;
+      if (active) {
+        button.setAttribute('aria-current', 'page');
+      } else {
+        button.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  function updateTopbar(page) {
+    const section = document.querySelector('.page[data-page="' + page + '"]');
+    const back = byId('backBtn');
+    const title = byId('topbarTitle');
+    const compact = page !== 'home' && !isDesktop();
+    if (back) {
+      back.hidden = !compact;
+    }
+    if (title) {
+      title.hidden = !compact;
+      title.textContent = section ? section.getAttribute('data-title') || '' : '';
+    }
+  }
+
+  function showPage(name, options) {
+    const opts = options || {};
+    const target = PAGES.indexOf(name) >= 0 ? name : 'home';
+    closeSheet();
+
+    if (state.page === target) {
+      return;
+    }
+
+    if (target === 'home') {
+      state.navStack = [];
+    } else if (state.page && !opts.fromBack) {
+      state.navStack.push(state.page);
+      if (state.navStack.length > 20) {
+        state.navStack.shift();
+      }
+    }
+    state.page = target;
+
+    let activeSection = null;
+    document.querySelectorAll('.page[data-page]').forEach(function (section) {
+      const isActive = section.getAttribute('data-page') === target;
+      section.hidden = !isActive;
+      if (isActive) {
+        activeSection = section;
+      }
+    });
+
+    const app = byId('app');
+    if (app) {
+      app.setAttribute('data-current-page', target);
+    }
+    updateNav(target);
+    updateTopbar(target);
+
+    if (target === 'chat') {
+      scrollChatToEnd();
+    } else {
+      window.scrollTo(0, 0);
+    }
+
+    if (activeSection && !opts.silent) {
+      activeSection.setAttribute('tabindex', '-1');
+      activeSection.focus({ preventScroll: true });
+    }
+  }
+
+  function goBack() {
+    showPage(state.navStack.pop() || 'home', { fromBack: true });
+  }
+
+  function watchViewport() {
+    const query = window.matchMedia('(min-width: 1024px)');
+    const refresh = function () {
+      if (state.page) {
+        updateTopbar(state.page);
+      }
+    };
+    if (query.addEventListener) {
+      query.addEventListener('change', refresh);
+    } else if (query.addListener) {
+      query.addListener(refresh);
+    }
+  }
+
+  function openExternal(url, missingMessage) {
+    const safe = httpsUrl(url);
+    if (!safe) {
+      showToast(missingMessage);
+      return;
+    }
+    window.open(safe, '_blank', 'noopener,noreferrer');
+  }
+
+  /* ==========================================================
+   * 8. DETAIL SHEET
+   * ========================================================== */
+
+  function openSheet() {
+    const sheet = byId('detailSheet');
+    const backdrop = byId('sheetBackdrop');
+    if (!sheet || !backdrop) {
+      return;
+    }
+    state.sheetTrigger = document.activeElement;
+    backdrop.hidden = false;
+    sheet.hidden = false;
+    document.body.style.overflow = 'hidden';
+    const close = byId('sheetClose');
+    if (close) {
+      close.focus();
+    }
+  }
+
+  function closeSheet() {
+    const sheet = byId('detailSheet');
+    const backdrop = byId('sheetBackdrop');
+    if (!sheet || sheet.hidden) {
+      return;
+    }
+    sheet.hidden = true;
+    if (backdrop) {
+      backdrop.hidden = true;
+    }
+    document.body.style.overflow = '';
+    if (state.sheetTrigger && document.body.contains(state.sheetTrigger)) {
+      state.sheetTrigger.focus();
+    }
+    state.sheetTrigger = null;
+  }
+
+  function badge(text, extraClass) {
+    return el('span', { className: 'badge' + (extraClass ? ' ' + extraClass : ''), text: text });
+  }
+
+  function openProgramSheet(programId) {
+    const program = state.programs.find(function (item) {
+      return item.id === programId;
+    });
+    const body = byId('sheetBody');
+    if (!program || !body) {
+      return;
+    }
+    clearNode(body);
+
+    const meta = el('div', { className: 'card-meta' });
+    if (isMock('programs')) {
+      meta.appendChild(badge('ตัวอย่าง'));
+    }
+    if (program.popular) {
+      meta.appendChild(badge('ยอดนิยม', 'badge-popular'));
+    }
+    if (program.level) {
+      meta.appendChild(badge(program.level));
+    }
+    if (program.category) {
+      meta.appendChild(el('span', { text: program.category }));
+    }
+
+    body.appendChild(el('h3', { text: program.name }));
+    body.appendChild(meta);
+    body.appendChild(el('p', { text: program.description || 'ยังไม่มีรายละเอียดหลักสูตรนี้ในระบบ' }));
+    if (program.duration) {
+      body.appendChild(el('p', { text: 'ระยะเวลาเรียน: ' + program.duration }));
+    }
+    if (program.careers.length) {
+      body.appendChild(el('strong', { text: 'เส้นทางอาชีพ' }));
+      const careers = el('div', { className: 'card-meta' });
+      program.careers.forEach(function (career) {
+        careers.appendChild(badge(career));
+      });
+      body.appendChild(careers);
+    }
+    body.appendChild(el('button', {
+      className: 'btn btn-primary btn-block',
+      text: 'ถามน้อง NICC เรื่องสาขานี้',
+      attrs: { type: 'button', 'data-prompt': 'อยากทราบรายละเอียดสาขา' + program.name }
+    }));
+    body.appendChild(el('button', {
+      className: 'btn btn-outline btn-block',
+      text: 'ดูขั้นตอนสมัครเรียน',
+      attrs: { type: 'button', 'data-route': 'admissions' }
+    }));
+    openSheet();
+  }
+
+  function openNewsSheet(newsId) {
+    const item = state.news.find(function (entry) {
+      return entry.id === newsId;
+    });
+    const body = byId('sheetBody');
+    if (!item || !body) {
+      return;
+    }
+    clearNode(body);
+
+    const meta = el('div', { className: 'card-meta' });
+    if (isMock('news')) {
+      meta.appendChild(badge('ตัวอย่าง'));
+    }
+    if (item.category) {
+      meta.appendChild(badge(item.category));
+    }
+    if (item.dateText) {
+      meta.appendChild(el('span', { text: item.dateText }));
+    }
+
+    body.appendChild(el('h3', { text: item.title }));
+    body.appendChild(meta);
+    body.appendChild(el('p', { text: item.summary || 'ยังไม่มีรายละเอียดข่าวนี้ในระบบ' }));
+    if (item.linkUrl) {
+      body.appendChild(el('a', {
+        className: 'btn btn-primary btn-block',
+        text: 'อ่านรายละเอียดเพิ่มเติม',
+        attrs: { href: item.linkUrl, target: '_blank', rel: 'noopener noreferrer' }
+      }));
+    }
+    openSheet();
+  }
+
+  /* ==========================================================
+   * 9. CARD BUILDERS
+   * ========================================================== */
+
+  function fillImagePlaceholder(box, iconId) {
+    box.style.display = 'flex';
+    box.style.alignItems = 'center';
+    box.style.justifyContent = 'center';
+    box.appendChild(svgUse(iconId, 'ic ic-lg'));
+  }
+
+  function buildCardImage(url, iconId) {
+    const box = el('div', { className: 'card-img' });
+    if (!url) {
+      fillImagePlaceholder(box, iconId);
+      return box;
+    }
+    const img = el('img', { attrs: { alt: '', loading: 'lazy', decoding: 'async' } });
+    img.onerror = function () {
+      img.remove();
+      fillImagePlaceholder(box, iconId);
+    };
+    img.src = url;
+    box.appendChild(img);
+    return box;
+  }
+
+  function buildProgramCard(program) {
+    const meta = el('div', { className: 'card-meta' });
+    if (isMock('programs')) {
+      meta.appendChild(badge('ตัวอย่าง'));
+    }
+    if (program.popular) {
+      meta.appendChild(badge('ยอดนิยม', 'badge-popular'));
+    }
+    if (program.level) {
+      meta.appendChild(badge(program.level));
+    }
+    if (program.category) {
+      meta.appendChild(el('span', { text: program.category }));
+    }
+
+    const body = el('div', { className: 'card-body' }, [
+      el('div', { className: 'card-title', text: program.name }),
+      program.description ? el('p', { className: 'card-text', text: program.description }) : null,
+      meta
+    ]);
+
+    return el('button', {
+      className: 'program-card',
+      attrs: { type: 'button', 'data-program-id': program.id }
+    }, [buildCardImage(program.imageUrl, 'i-programs'), body]);
+  }
+
+  function buildNewsCard(item) {
+    const meta = el('div', { className: 'card-meta' });
+    if (isMock('news')) {
+      meta.appendChild(badge('ตัวอย่าง'));
+    }
+    if (item.category) {
+      meta.appendChild(badge(item.category));
+    }
+    if (item.dateText) {
+      meta.appendChild(el('span', { text: item.dateText }));
+    }
+
+    const body = el('div', { className: 'card-body' }, [
+      el('div', { className: 'card-title', text: item.title }),
+      item.summary ? el('p', { className: 'card-text', text: item.summary }) : null,
+      meta
+    ]);
+
+    return el('button', {
+      className: 'news-card',
+      attrs: { type: 'button', 'data-news-id': item.id }
+    }, [buildCardImage(item.imageUrl, 'i-news'), body]);
+  }
+
+  function buildContactCard(contact) {
+    const iconBox = el('div', { className: 'card-ico' }, [
+      svgUse(CONTACT_ICONS[contact.type] || 'i-info', 'ic')
+    ]);
+    const body = el('div', { className: 'card-body' }, [
+      el('div', { className: 'card-title', text: contact.label || contact.type }),
+      el('p', { className: 'card-text', text: contact.value }),
+      contact.note ? el('div', { className: 'card-meta', text: contact.note }) : null
+    ]);
+
+    if (!contact.href) {
+      return el('div', { className: 'contact-card' }, [iconBox, body]);
+    }
+    const attrs = { href: contact.href };
+    if (/^https:/i.test(contact.href)) {
+      attrs.target = '_blank';
+      attrs.rel = 'noopener noreferrer';
+    }
+    return el('a', { className: 'contact-card', attrs: attrs }, [iconBox, body]);
+  }
+
+  /* ==========================================================
+   * 10. PAGE RENDERERS
+   * ========================================================== */
+
+  function renderHomePrograms() {
+    const container = byId('homePrograms');
+    if (!container) {
+      return;
+    }
+    const heading = container.previousElementSibling;
+    const featured = state.programs.filter(function (program) {
+      return program.popular;
+    }).slice(0, 6);
+
+    clearNode(container);
+    container.hidden = featured.length === 0;
+    if (heading) {
+      heading.hidden = featured.length === 0;
+    }
+    featured.forEach(function (program) {
+      container.appendChild(buildProgramCard(program));
+    });
+  }
+
+  function renderHomeNews() {
+    const container = byId('homeNews');
+    if (!container) {
+      return;
+    }
+    clearNode(container);
+    if (!state.news.length) {
+      renderState(container, 'empty', {
+        title: 'ยังไม่มีข่าวสาร',
+        text: 'เมื่อวิทยาลัยเพิ่มข่าวหรือกิจกรรม จะแสดงที่นี่ครับ'
+      });
+      return;
+    }
+    state.news.slice(0, 3).forEach(function (item) {
+      container.appendChild(buildNewsCard(item));
+    });
+  }
+
+  function renderNewsPage() {
+    const container = byId('newsList');
+    if (!container) {
+      return;
+    }
+    clearNode(container);
+    if (!state.news.length) {
+      renderState(container, 'empty', {
+        title: 'ยังไม่มีข่าวสารและกิจกรรม',
+        text: 'ลองกลับมาดูใหม่ภายหลัง หรือถามน้อง NICC ได้ครับ',
+        actionLabel: 'ถามน้อง NICC',
+        actionAttrs: { 'data-route': 'chat' }
+      });
+      return;
+    }
+    state.news.forEach(function (item) {
+      container.appendChild(buildNewsCard(item));
+    });
+  }
+
+  function renderProgramChips() {
+    const container = byId('programChips');
+    if (!container) {
+      return;
+    }
+    clearNode(container);
+
+    const categories = [];
+    state.programs.forEach(function (program) {
+      if (program.category && categories.indexOf(program.category) < 0) {
+        categories.push(program.category);
+      }
+    });
+    container.hidden = categories.length === 0;
+    if (!categories.length) {
+      return;
+    }
+
+    ['' ].concat(categories).forEach(function (category) {
+      const active = state.programCategory === category;
+      container.appendChild(el('button', {
+        className: 'chip' + (active ? ' is-active' : ''),
+        text: category || 'ทั้งหมด',
+        attrs: { type: 'button', 'data-chip': category, 'aria-pressed': String(active) }
+      }));
+    });
+  }
+
+  function filterPrograms() {
+    const query = state.programQuery.trim().toLowerCase();
+    return state.programs.filter(function (program) {
+      if (state.programCategory && program.category !== state.programCategory) {
+        return false;
+      }
+      if (!query) {
+        return true;
+      }
+      const haystack = [program.name, program.category, program.level, program.description]
+        .concat(program.careers)
+        .join(' ')
+        .toLowerCase();
+      return haystack.indexOf(query) >= 0;
+    });
+  }
+
+  function renderPrograms() {
+    const container = byId('programList');
+    if (!container) {
+      return;
+    }
+    clearNode(container);
+
+    if (!state.programs.length) {
+      renderState(container, 'empty', {
+        title: 'ยังไม่มีข้อมูลหลักสูตร',
+        text: 'วิทยาลัยยังไม่ได้เพิ่มหลักสูตรในระบบ ลองสอบถามน้อง NICC หรือติดต่อวิทยาลัยครับ',
+        actionLabel: 'ถามน้อง NICC',
+        actionAttrs: { 'data-route': 'chat' }
+      });
+      return;
+    }
+
+    const results = filterPrograms();
+    const filtered = Boolean(state.programQuery.trim() || state.programCategory);
+
+    if (!results.length) {
+      renderState(container, 'empty', {
+        title: 'ไม่พบหลักสูตรที่ค้นหา',
+        text: 'ลองเปลี่ยนคำค้นหา หรือล้างตัวกรองเพื่อดูทั้งหมด',
+        actionLabel: 'ล้างตัวกรอง',
+        actionAttrs: { 'data-clear-filters': '' }
+      });
+      return;
+    }
+
+    if (filtered) {
+      const summary = el('div', { className: 'section-head' }, [
+        el('span', { className: 'caption', text: 'พบ ' + results.length + ' หลักสูตร' }),
+        el('button', {
+          className: 'link-btn',
+          text: 'ล้างตัวกรอง',
+          attrs: { type: 'button', 'data-clear-filters': '' }
+        })
+      ]);
+      summary.style.gridColumn = '1 / -1';
+      container.appendChild(summary);
+    }
+    results.forEach(function (program) {
+      container.appendChild(buildProgramCard(program));
+    });
+  }
+
+  function renderContacts() {
+    const container = byId('contactList');
+    const callButton = byId('callBtn');
+    if (!container) {
+      return;
+    }
+    clearNode(container);
+    if (callButton) {
+      callButton.hidden = true;
+    }
+
+    // ข้อมูลติดต่อตัวอย่างไม่ถูกแสดง เพื่อกันผู้ใช้โทรหรือติดต่อผิดที่
+    if (isMock('contacts')) {
+      renderState(container, 'empty', {
+        title: 'ยังไม่มีข้อมูลช่องทางติดต่อ',
+        text: 'ระบบยังไม่ได้เชื่อมข้อมูลติดต่อจริงของวิทยาลัย (ขณะนี้เป็นโหมดข้อมูลตัวอย่าง)',
+        actionLabel: 'ถามน้อง NICC',
+        actionAttrs: { 'data-route': 'chat' }
+      });
+      return;
+    }
+    if (!state.contacts.length) {
+      renderState(container, 'empty', {
+        title: 'ยังไม่มีช่องทางติดต่อ',
+        text: 'วิทยาลัยยังไม่ได้เพิ่มช่องทางติดต่อในระบบ'
+      });
+      return;
+    }
+
+    state.contacts.forEach(function (contact) {
+      container.appendChild(buildContactCard(contact));
+    });
+
+    const phone = state.contacts.find(function (contact) {
+      return contact.type === 'phone' && /^tel:/.test(contact.href);
+    });
+    if (phone && callButton) {
+      callButton.href = phone.href;
+      callButton.hidden = false;
+    }
+  }
+
+  function renderMap() {
+    const card = byId('mapCard');
+    const box = byId('mapBox');
+    const button = byId('mapBtn');
+    if (!card || !box || !button) {
+      return;
+    }
+    card.hidden = true;
+    button.hidden = true;
+    clearNode(box);
+
+    if (isMock('settings')) {
+      return;
+    }
+
+    const lat = parseFloat(state.settings.mapLat);
+    const lng = parseFloat(state.settings.mapLng);
+    const validPoint = isFinite(lat) && isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+    const customUrl = httpsUrl(state.settings.mapUrl);
+
+    if (validPoint) {
+      box.appendChild(el('iframe', {
+        attrs: {
+          title: 'แผนที่วิทยาลัย',
+          loading: 'lazy',
+          referrerpolicy: 'no-referrer-when-downgrade',
+          src: 'https://maps.google.com/maps?q=' + lat + ',' + lng + '&z=15&output=embed'
+        }
+      }));
+      card.hidden = false;
+    }
+
+    const link = customUrl || (validPoint
+      ? 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lng
+      : '');
+    if (link) {
+      button.href = link;
+      button.hidden = false;
+    }
+  }
+
+  function renderCareerUnavailable() {
+    const result = byId('careerResult');
+    const flow = byId('careerFlow');
+    if (flow) {
+      flow.hidden = true;
+    }
+    if (!result) {
+      return;
+    }
+    result.hidden = false;
+    renderState(result, 'empty', {
+      title: 'แบบประเมินยังไม่เปิดให้ใช้งาน',
+      text: 'ระบบยังไม่มีชุดคำถามแนะแนวจากวิทยาลัย ระหว่างนี้ให้น้อง NICC ช่วยแนะนำสาขาจากความสนใจของคุณได้ครับ',
+      actionLabel: 'ปรึกษาน้อง NICC',
+      actionAttrs: { 'data-prompt': 'อยากให้ช่วยแนะนำสาขาที่เหมาะกับความสนใจของฉัน' }
+    });
+  }
+
+  /* ==========================================================
+   * CAREER MATCH (Holland RIASEC) + SHARE CARD
+   * ========================================================== */
+
+  const CAREER_OPTIONS = [
+    { value: 2, label: 'ชอบมาก' },
+    { value: 1, label: 'พอใช้' },
+    { value: 0, label: 'ไม่ค่อยชอบ' }
+  ];
+  const FIT_LABELS = { high: 'เข้ากันมาก', good: 'เข้ากันดี', explore: 'น่าลองดู' };
+  const CARD_FONT = '"Noto Sans Thai", "Sarabun", sans-serif';
+
+  function setCareerView(view) {
+    const views = { careerIntro: 'intro', careerFlow: 'flow', careerResult: 'result' };
+    Object.keys(views).forEach(function (id) {
+      const node = byId(id);
+      if (node) {
+        node.hidden = views[id] !== view;
+      }
+    });
+  }
+
+  function startCareer() {
+    const career = state.career;
+    if (!career.questions.length || !career.types.length) {
+      renderCareerUnavailable();
+      return;
+    }
+    career.index = 0;
+    career.answers = {};
+    career.busy = false;
+    career.result = null;
+    setCareerView('flow');
+    renderCareerQuestion();
+  }
+
+  function renderCareerQuestion() {
+    const career = state.career;
+    const total = career.questions.length;
+    const question = career.questions[career.index];
+    const bar = byId('careerBar');
+    const progress = byId('careerProgress');
+    const title = byId('careerQuestion');
+    const options = byId('careerOptions');
+    if (!question || !bar || !progress || !title || !options) {
+      return;
+    }
+
+    bar.style.width = Math.round(career.index / total * 100) + '%';
+    progress.textContent = 'ข้อ ' + (career.index + 1) + ' จาก ' + total;
+    title.textContent = question.text;
+
+    clearNode(options);
+    CAREER_OPTIONS.forEach(function (option) {
+      const selected = career.answers[question.id] === option.value;
+      options.appendChild(el('button', {
+        className: 'option' + (selected ? ' is-selected' : ''),
+        text: option.label,
+        attrs: { type: 'button', 'data-career-answer': String(option.value) }
+      }));
+    });
+    options.appendChild(el('button', {
+      className: 'btn btn-outline',
+      text: career.index > 0 ? 'ย้อนกลับ' : 'ยกเลิก',
+      attrs: { type: 'button', 'data-action': 'career-back' }
+    }));
+  }
+
+  function answerCareer(value) {
+    const career = state.career;
+    const question = career.questions[career.index];
+    const valid = CAREER_OPTIONS.some(function (option) {
+      return option.value === value;
+    });
+    if (career.busy || !question || !valid) {
+      return;
+    }
+    career.answers[question.id] = value;
+    if (career.index < career.questions.length - 1) {
+      career.index += 1;
+      renderCareerQuestion();
+    } else {
+      submitCareer();
+    }
+  }
+
+  function handleCareerBack() {
+    const career = state.career;
+    if (career.busy) {
+      return;
+    }
+    if (career.index > 0) {
+      career.index -= 1;
+      renderCareerQuestion();
+    } else {
+      setCareerView('intro');
+    }
+  }
+
+  function submitCareer() {
+    const career = state.career;
+    const options = byId('careerOptions');
+    const bar = byId('careerBar');
+    if (career.busy || !options) {
+      return;
+    }
+    career.busy = true;
+    if (bar) {
+      bar.style.width = '100%';
+    }
+    showLoading(options);
+
+    const answers = career.questions.map(function (question) {
+      return { id: question.id, value: career.answers[question.id] };
+    });
+
+    callServer('getCareerResult', [answers], function (response) {
+      career.busy = false;
+      showCareerResult(response);
+    }, function (error) {
+      career.busy = false;
+      console.error('[NICC] getCareerResult failed', error);
+      renderState(options, 'error', {
+        title: 'ประเมินผลไม่สำเร็จ',
+        text: 'เชื่อมต่อระบบไม่ได้ กรุณาลองอีกครั้ง',
+        actionLabel: 'ลองอีกครั้ง',
+        actionAttrs: { 'data-action': 'career-retry' }
+      });
+    });
+  }
+
+  function showCareerResult(response) {
+    const valid = isObject(response) && response.ok === true &&
+      Array.isArray(response.top) && response.top.length > 0 && Array.isArray(response.scores);
+    if (!valid) {
+      showToast(isObject(response) && response.message ? toText(response.message) : 'ประเมินผลไม่สำเร็จ กรุณาลองอีกครั้ง');
+      renderCareerQuestion();
+      return;
+    }
+    state.career.result = response;
+    setCareerView('result');
+    buildCareerResult(response);
+    makeShareCard(response);
+    window.scrollTo(0, 0);
+  }
+
+  function buildCareerResult(result) {
+    const box = byId('careerResult');
+    if (!box) {
+      return;
+    }
+    clearNode(box);
+    const sampleData = isMock('career') || isMock('programs');
+
+    box.appendChild(el('div', { className: 'career-card-preview', attrs: { id: 'careerCardPreview' } }, [
+      el('div', { className: 'spinner', attrs: { role: 'status', 'aria-label': 'กำลังสร้างการ์ด' } })
+    ]));
+
+    box.appendChild(el('h3', { text: 'สไตล์ของคุณ: ' + result.styleTitle }));
+    const codes = el('div', { className: 'card-meta' });
+    result.top.forEach(function (item) {
+      codes.appendChild(badge(item.code + ' ' + item.nameTh, 'badge-popular'));
+    });
+    box.appendChild(codes);
+    box.appendChild(el('p', { text: result.top[0].description }));
+
+    box.appendChild(el('strong', { text: 'ระดับความสนใจ' }));
+    result.scores.forEach(function (score) {
+      const fill = el('i');
+      fill.style.width = Math.max(0, Math.min(100, Number(score.pct) || 0)) + '%';
+      box.appendChild(el('div', { className: 'score-row' }, [
+        el('div', { className: 'caption' }, [
+          el('span', { text: toText(score.nameTh) }),
+          el('span', { text: (Number(score.pct) || 0) + '%' })
+        ]),
+        el('div', { className: 'progress' }, [fill])
+      ]));
+    });
+
+    box.appendChild(el('strong', { text: 'สาขาที่น่าสนใจ' }));
+    const list = el('div', { className: 'stack' });
+    (Array.isArray(result.programs) ? result.programs : []).forEach(function (match) {
+      const program = state.programs.find(function (item) {
+        return item.id === toText(match.id);
+      });
+      if (!program) {
+        return;
+      }
+      const card = buildProgramCard(program);
+      const meta = card.querySelector('.card-meta');
+      if (meta) {
+        meta.insertBefore(badge(FIT_LABELS[match.fit] || FIT_LABELS.explore, 'badge-popular'), meta.firstChild);
+      }
+      list.appendChild(card);
+    });
+    if (list.childNodes.length) {
+      box.appendChild(list);
+    } else {
+      box.appendChild(el('p', {
+        className: 'caption',
+        text: 'ยังไม่มีสาขาที่จับคู่กับผลนี้ได้ในตอนนี้ ลองให้น้อง NICC หรือครูแนะแนวช่วยแนะนำครับ'
+      }));
+    }
+
+    box.appendChild(el('p', {
+      className: 'caption',
+      text: 'เป็นคำแนะนำเบื้องต้นจากความสนใจของคุณ ไม่ใช่ผลทดสอบวิชาชีพ ควรปรึกษาครูแนะแนวประกอบการตัดสินใจ' +
+        (sampleData ? ' (ผลนี้ใช้ชุดคำถามและข้อมูลสาขาตัวอย่าง)' : '')
+    }));
+
+    box.appendChild(el('div', { className: 'btn-stack' }, [
+      el('button', { className: 'btn btn-primary btn-block', text: 'แชร์การ์ดผลแนะแนว', attrs: { type: 'button', 'data-action': 'career-share' } }),
+      el('button', { className: 'btn btn-outline btn-block', text: 'บันทึกการ์ดเป็นรูปภาพ', attrs: { type: 'button', 'data-action': 'career-save' } }),
+      el('button', {
+        className: 'btn btn-secondary btn-block',
+        text: 'ให้น้อง NICC อธิบายผล',
+        attrs: {
+          type: 'button',
+          'data-prompt': 'ผลแนะแนวของฉันคือรหัส ' + result.hollandCode + ' สไตล์' + result.styleTitle + ' ช่วยอธิบายและแนะนำสาขาที่เหมาะกับฉัน'
+        }
+      }),
+      el('button', { className: 'btn btn-outline btn-block', text: 'ทำแบบประเมินใหม่', attrs: { type: 'button', 'data-action': 'career-restart' } })
+    ]));
+  }
+
+  /* ---------- Share card (วาดด้วย Canvas ไม่ใช้ไลบรารี) ---------- */
+
+  function ensureCardFonts() {
+    if (!document.fonts || !document.fonts.load) {
+      return Promise.resolve();
+    }
+    return Promise.all([
+      document.fonts.load('800 40px "Noto Sans Thai"', 'สไตล์ก'),
+      document.fonts.load('600 32px "Noto Sans Thai"', 'สไตล์ก')
+    ]).catch(function () {
+      return null;
+    });
+  }
+
+  // โหลดมาสคอตแบบ CORS เท่านั้น ถ้าโฮสต์ไม่อนุญาตจะข้ามไป (การ์ดยังสร้างได้)
+  function loadCardMascot() {
+    const url = httpsUrl(state.settings.mascotCheerUrl) || httpsUrl(state.settings.mascotImageUrl);
+    return new Promise(function (resolve) {
+      if (!url) {
+        resolve(null);
+        return;
+      }
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function () {
+        resolve(img);
+      };
+      img.onerror = function () {
+        resolve(null);
+      };
+      img.src = url;
+    });
+  }
+
+  function roundedRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function fitCardText(ctx, text, maxWidth) {
+    let value = text;
+    if (ctx.measureText(value).width <= maxWidth) {
+      return value;
+    }
+    while (value.length > 1 && ctx.measureText(value + '…').width > maxWidth) {
+      value = value.slice(0, -1);
+    }
+    return value + '…';
+  }
+
+  function wrapCardText(ctx, text, maxWidth, maxLines) {
+    const tokens = (typeof Intl !== 'undefined' && Intl.Segmenter)
+      ? Array.from(new Intl.Segmenter('th', { granularity: 'word' }).segment(text), function (part) {
+        return part.segment;
+      })
+      : Array.from(text);
+    const lines = [];
+    let line = '';
+    tokens.forEach(function (token) {
+      if (ctx.measureText(line + token).width > maxWidth && line) {
+        lines.push(line.trim());
+        line = token;
+      } else {
+        line += token;
+      }
+    });
+    if (line.trim()) {
+      lines.push(line.trim());
+    }
+    if (lines.length > maxLines) {
+      const kept = lines.slice(0, maxLines);
+      kept[maxLines - 1] = fitCardText(ctx, kept[maxLines - 1], maxWidth);
+      return kept;
+    }
+    return lines;
+  }
+
+  function drawShareCard(result, mascot) {
+    const W = 1080;
+    const H = 1350;
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    const sampleData = isMock('career') || isMock('programs');
+    const collegeName = toText(state.settings.collegeName) || 'NICC';
+
+    const background = ctx.createLinearGradient(0, 0, 0, H);
+    background.addColorStop(0, '#CFE9FF');
+    background.addColorStop(1, '#F2F7FD');
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, W, H);
+
+    const header = ctx.createLinearGradient(0, 0, W, 260);
+    header.addColorStop(0, '#1565FF');
+    header.addColorStop(1, '#0B2E8A');
+    ctx.fillStyle = header;
+    ctx.fillRect(0, 0, W, 270);
+
+    ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '800 64px ' + CARD_FONT;
+    ctx.fillText('NICC Smart PR', 60, 105);
+    ctx.fillStyle = '#CFE9FF';
+    ctx.font = '600 32px ' + CARD_FONT;
+    ctx.fillText(fitCardText(ctx, collegeName, 600), 60, 160);
+    ctx.fillStyle = '#FFC629';
+    ctx.font = '700 40px ' + CARD_FONT;
+    ctx.fillText('ผลแนะแนวอาชีพ', 60, 225);
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(11, 46, 138, 0.25)';
+    ctx.shadowBlur = 40;
+    ctx.shadowOffsetY = 12;
+    ctx.fillStyle = '#FFFFFF';
+    roundedRect(ctx, 50, 300, 980, 900, 40);
+    ctx.fill();
+    ctx.restore();
+
+    if (mascot && mascot.naturalWidth) {
+      const size = 320;
+      const ratio = Math.min(size / mascot.naturalWidth, size / mascot.naturalHeight);
+      const w = mascot.naturalWidth * ratio;
+      const h = mascot.naturalHeight * ratio;
+      ctx.drawImage(mascot, 690 + (size - w) / 2, 100 + (size - h), w, h);
+    }
+
+    ctx.fillStyle = '#5B6B8C';
+    ctx.font = '600 32px ' + CARD_FONT;
+    ctx.fillText('สไตล์ของฉัน', 100, 385);
+
+    ctx.fillStyle = '#0B2E8A';
+    ctx.font = '800 68px ' + CARD_FONT;
+    let y = 465;
+    wrapCardText(ctx, result.styleTitle, 880, 2).forEach(function (line) {
+      ctx.fillText(line, 100, y);
+      y += 80;
+    });
+
+    y += 4;
+    ctx.textAlign = 'center';
+    result.hollandCode.split('').forEach(function (letter, index) {
+      const cx = 130 + index * 76;
+      ctx.fillStyle = '#FFC629';
+      ctx.beginPath();
+      ctx.arc(cx, y + 30, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#0B2E8A';
+      ctx.font = '800 36px ' + CARD_FONT;
+      ctx.fillText(letter, cx, y + 43);
+    });
+    ctx.textAlign = 'left';
+    y += 90;
+
+    ctx.fillStyle = '#0B2E8A';
+    ctx.font = '700 34px ' + CARD_FONT;
+    ctx.fillText('ระดับความสนใจ', 100, y + 30);
+    y += 60;
+    ctx.font = '600 30px ' + CARD_FONT;
+    result.scores.slice(0, 3).forEach(function (score) {
+      const pct = Math.max(0, Math.min(100, Number(score.pct) || 0));
+      ctx.fillStyle = '#1E293B';
+      ctx.textAlign = 'left';
+      ctx.fillText(fitCardText(ctx, toText(score.nameTh), 240), 100, y + 28);
+      ctx.fillStyle = '#E8F2FF';
+      roundedRect(ctx, 360, y + 6, 500, 26, 13);
+      ctx.fill();
+      if (pct > 0) {
+        const fill = ctx.createLinearGradient(360, 0, 860, 0);
+        fill.addColorStop(0, '#3EB7FF');
+        fill.addColorStop(1, '#1565FF');
+        ctx.fillStyle = fill;
+        roundedRect(ctx, 360, y + 6, Math.max(26, 500 * pct / 100), 26, 13);
+        ctx.fill();
+      }
+      ctx.fillStyle = '#5B6B8C';
+      ctx.textAlign = 'right';
+      ctx.fillText(pct + '%', 980, y + 28);
+      y += 56;
+    });
+    ctx.textAlign = 'left';
+
+    y += 18;
+    ctx.fillStyle = '#0B2E8A';
+    ctx.font = '700 34px ' + CARD_FONT;
+    ctx.fillText('สาขาที่น่าสนใจ', 100, y + 30);
+    y += 64;
+    ctx.font = '600 36px ' + CARD_FONT;
+    const programs = (Array.isArray(result.programs) ? result.programs : []).slice(0, 3);
+    if (programs.length) {
+      programs.forEach(function (program) {
+        ctx.fillStyle = '#1E293B';
+        ctx.fillText(fitCardText(ctx, '• ' + toText(program.name), 860), 100, y + 30);
+        y += 54;
+      });
+    } else {
+      ctx.fillStyle = '#5B6B8C';
+      ctx.font = '600 30px ' + CARD_FONT;
+      ctx.fillText('ปรึกษาครูแนะแนวเพื่อดูสาขาที่เหมาะกับคุณ', 100, y + 30);
+    }
+
+    ctx.fillStyle = '#5B6B8C';
+    ctx.font = '600 24px ' + CARD_FONT;
+    ctx.fillText('เป็นคำแนะนำเบื้องต้น ไม่ใช่ผลทดสอบวิชาชีพ', 100, 1160);
+    if (sampleData) {
+      ctx.fillText('(ผลจากชุดคำถามและข้อมูลสาขาตัวอย่าง)', 100, 1190);
+    }
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#0B2E8A';
+    ctx.font = '700 34px ' + CARD_FONT;
+    ctx.fillText('ลองทำแบบประเมินกับน้อง NICC', W / 2, 1268);
+    ctx.fillStyle = '#5B6B8C';
+    ctx.font = '600 28px ' + CARD_FONT;
+    ctx.fillText(fitCardText(ctx, toText(state.settings.tagline), 900), W / 2, 1312);
+    return canvas;
+  }
+
+  function makeShareCard(result) {
+    Promise.all([ensureCardFonts(), loadCardMascot()]).then(function (parts) {
+      const canvas = drawShareCard(result, parts[1]);
+      return new Promise(function (resolve) {
+        canvas.toBlob(resolve, 'image/png');
+      });
+    }).then(function (blob) {
+      if (state.career.result !== result) {
+        return;
+      }
+      if (!blob) {
+        throw new Error('toBlob returned null');
+      }
+      if (state.career.cardUrl) {
+        URL.revokeObjectURL(state.career.cardUrl);
+      }
+      state.career.cardBlob = blob;
+      state.career.cardUrl = URL.createObjectURL(blob);
+      const preview = byId('careerCardPreview');
+      if (preview) {
+        clearNode(preview);
+        preview.appendChild(el('img', { attrs: { src: state.career.cardUrl, alt: 'การ์ดผลแนะแนวของคุณ' } }));
+      }
+    }).catch(function (error) {
+      console.error('[NICC] share card failed', error);
+      state.career.cardBlob = null;
+      const preview = byId('careerCardPreview');
+      if (preview && state.career.result === result) {
+        clearNode(preview);
+        preview.appendChild(el('p', { className: 'caption', text: 'สร้างการ์ดไม่สำเร็จ แต่ผลแนะแนวด้านล่างยังใช้ได้ตามปกติ' }));
+      }
+    });
+  }
+
+  function saveCareerCard() {
+    if (!state.career.cardUrl) {
+      showToast('การ์ดยังไม่พร้อม กรุณารอสักครู่');
+      return;
+    }
+    const link = document.createElement('a');
+    link.href = state.career.cardUrl;
+    link.download = 'nicc-career-card.png';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    showToast('หากไม่เริ่มดาวน์โหลด ให้กดค้างที่รูปการ์ดแล้วเลือกบันทึกรูปภาพ');
+  }
+
+  function shareCareerCard() {
+    const blob = state.career.cardBlob;
+    if (!blob) {
+      showToast('การ์ดยังไม่พร้อม กรุณารอสักครู่');
+      return;
+    }
+    const file = new File([blob], 'nicc-career-card.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: 'ผลแนะแนวอาชีพ NICC Smart PR' }).catch(function (error) {
+        if (!error || error.name !== 'AbortError') {
+          saveCareerCard();
+        }
+      });
+    } else {
+      saveCareerCard();
+    }
+  }
+
+  function renderAll() {
+    safeRender('home programs', renderHomePrograms, byId('homePrograms'));
+    safeRender('home news', renderHomeNews, byId('homeNews'));
+    safeRender('program chips', renderProgramChips, null);
+    safeRender('programs', renderPrograms, byId('programList'));
+    safeRender('news', renderNewsPage, byId('newsList'));
+    safeRender('contacts', renderContacts, byId('contactList'));
+    safeRender('map', renderMap, null);
+  }
+
+  function safeRender(label, renderer, container) {
+    try {
+      renderer();
+    } catch (error) {
+      console.error('[NICC] render ' + label, error);
+      renderState(container, 'error', {
+        title: 'แสดงข้อมูลไม่สำเร็จ',
+        text: 'กรุณาลองใหม่อีกครั้ง'
+      });
+    }
+  }
+
+  function showAllLoading() {
+    ['homePrograms', 'homeNews', 'programList', 'newsList', 'contactList'].forEach(function (id) {
+      showLoading(byId(id));
+    });
+  }
+
+  /* ==========================================================
+   * 11. BOOTSTRAP (getBootstrap)
+   * ========================================================== */
+
+  function loadBootstrap() {
+    if (state.loading) {
+      return;
+    }
+    state.loading = true;
+    setGlobalError(false);
+    setSplash(true);
+    showAllLoading();
+
+    let finished = false;
+    const timer = window.setTimeout(function () {
+      finish(function () {
+        failBootstrap(null, true);
+      });
+    }, BOOT_TIMEOUT_MS);
+
+    function finish(handler) {
+      if (finished) {
+        return;
+      }
+      finished = true;
+      window.clearTimeout(timer);
+      state.loading = false;
+      handler();
+    }
+
+    callServer('getBootstrap', [], function (response) {
+      finish(function () {
+        onBootstrap(response);
+      });
+    }, function (error) {
+      finish(function () {
+        failBootstrap(error, false);
+      });
+    });
+  }
+
+  function onBootstrap(response) {
+    if (!isObject(response) || response.ok !== true || !isObject(response.settings)) {
+      failBootstrap(isObject(response) ? response.error : null, false);
+      return;
+    }
+
+    state.settings = response.settings;
+    state.sources = isObject(response.sources) ? response.sources : {};
+    state.config = isObject(response.config) ? response.config : {};
+    state.programs = toList(response.programs, normalizeProgram);
+    state.news = toList(response.news, normalizeNews);
+    state.contacts = toList(response.contacts, normalizeContact);
+    const career = isObject(response.career) ? response.career : {};
+    state.career.questions = toList(career.questions, normalizeCareerQuestion);
+    state.career.types = toList(career.types, normalizeCareerType);
+
+    const suggestions = Array.isArray(response.suggestions)
+      ? response.suggestions.map(toText).filter(Boolean)
+      : [];
+
+    applyBindings();
+    applyBrand();
+    applyPhotos();
+    applyMascots(document);
+    applySourceStatus();
+    renderAll();
+    renderSuggestions(suggestions);
+
+    setSplash(false);
+    state.booted = true;
+
+    if (!state.page) {
+      const app = byId('app');
+      showPage(app ? app.getAttribute('data-initial-page') : 'home', { silent: true });
+    }
+
+    const warnings = Array.isArray(response.warnings) ? response.warnings.map(toText).filter(Boolean) : [];
+    if (warnings.length) {
+      console.warn('[NICC] warnings', warnings);
+      showToast(warnings[0]);
+    }
+  }
+
+  function failBootstrap(error, timedOut) {
+    console.error('[NICC] bootstrap failed', error);
+    let message = 'เชื่อมต่อข้อมูลไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วลองอีกครั้ง';
+    if (timedOut) {
+      message = 'การโหลดข้อมูลใช้เวลานานเกินไป กรุณาลองอีกครั้ง';
+    } else if (typeof error === 'string' && error) {
+      message = error;
+    }
+    setSplash(false);
+    setGlobalError(true, message);
+  }
+
+  /* ==========================================================
+   * 12. AI CHATBOT (askAI)
+   * ========================================================== */
+
+  function createSessionId() {
+    return 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  function loadSessionId() {
+    try {
+      const saved = window.sessionStorage.getItem('nicc_session');
+      if (saved) {
+        return saved;
+      }
+      const fresh = createSessionId();
+      window.sessionStorage.setItem('nicc_session', fresh);
+      return fresh;
+    } catch (error) {
+      return createSessionId();
+    }
+  }
+
+  function scrollChatToEnd() {
+    const log = byId('chatLog');
+    if (log) {
+      log.scrollTop = log.scrollHeight;
+    }
+  }
+
+  function createAvatar() {
+    const slot = el('figure', {
+      className: 'mascot-slot mascot-avatar',
+      attrs: { 'data-mascot': 'head' }
+    });
+    const img = el('img', { className: 'mascot-img', attrs: { alt: '', decoding: 'async' } });
+    img.hidden = true;
+    slot.appendChild(img);
+    slot.appendChild(svgUse('mascot-silhouette', 'mascot-ph'));
+    applyMascots(slot);
+    return slot;
+  }
+
+  function buildRelatedList(related) {
+    const list = el('div', { className: 'related-list' });
+    related.forEach(function (brief) {
+      const full = isObject(brief) ? state.programs.find(function (program) {
+        return program.id === toText(brief.id);
+      }) : null;
+      if (full) {
+        list.appendChild(buildProgramCard(full));
+      }
+    });
+    return list.childNodes.length ? list : null;
+  }
+
+  function appendMessage(role, text, options) {
+    const log = byId('chatLog');
+    if (!log) {
+      return null;
+    }
+    const opts = options || {};
+    const wrap = el('div', { className: 'bubble-wrap' });
+
+    wrap.appendChild(el('div', { className: 'bubble', text: text }));
+    if (opts.note) {
+      wrap.appendChild(el('span', { className: 'msg-time', text: opts.note }));
+    }
+    if (Array.isArray(opts.related) && opts.related.length) {
+      const related = buildRelatedList(opts.related);
+      if (related) {
+        wrap.appendChild(related);
+      }
+    }
+    if (opts.retry) {
+      wrap.appendChild(el('button', {
+        className: 'chip',
+        text: 'ลองส่งอีกครั้ง',
+        attrs: { type: 'button', 'data-retry-chat': '' }
+      }));
+    }
+    wrap.appendChild(el('span', { className: 'msg-time', text: opts.time || nowTime() }));
+
+    const message = el('div', { className: 'msg msg-' + role });
+    if (role === 'bot') {
+      message.appendChild(createAvatar());
+    }
+    message.appendChild(wrap);
+    log.appendChild(message);
+
+    while (log.children.length > MAX_MESSAGES) {
+      log.removeChild(log.firstChild);
+    }
+    scrollChatToEnd();
+    return message;
+  }
+
+  function appendTyping() {
+    const log = byId('chatLog');
+    if (!log) {
+      return null;
+    }
+    const typing = el('span', {
+      className: 'typing',
+      attrs: { role: 'status', 'aria-label': 'น้อง NICC กำลังพิมพ์' }
+    }, [el('i'), el('i'), el('i')]);
+    const message = el('div', { className: 'msg msg-bot' }, [
+      createAvatar(),
+      el('div', { className: 'bubble-wrap' }, [el('div', { className: 'bubble' }, [typing])])
+    ]);
+    log.appendChild(message);
+    scrollChatToEnd();
+    return message;
+  }
+
+  function setChatBusy(isBusy) {
+    const send = byId('chatSend');
+    const log = byId('chatLog');
+    if (send) {
+      send.disabled = isBusy;
+    }
+    if (log) {
+      log.setAttribute('aria-busy', String(isBusy));
+    }
+  }
+
+  function renderSuggestions(items) {
+    const container = byId('chatSuggestions');
+    if (!container) {
+      return;
+    }
+    clearNode(container);
+    container.hidden = items.length === 0;
+    items.forEach(function (text) {
+      container.appendChild(el('button', {
+        className: 'chip chip-prompt',
+        text: text,
+        attrs: { type: 'button', 'data-suggest': text }
+      }));
+    });
+  }
+
+  function showChatError(message) {
+    appendMessage('bot', message || 'ขออภัยครับ ตอนนี้เชื่อมต่อระบบไม่ได้ ลองใหม่อีกครั้ง หรือติดต่อวิทยาลัยโดยตรงนะครับ', {
+      retry: true
+    });
+  }
+
+  function handleAiResponse(response) {
+    if (!isObject(response) || typeof response.answer !== 'string' || !response.answer.trim()) {
+      showChatError();
+      return;
+    }
+    const retryable = response.ok === false && response.code !== 'EMPTY';
+    appendMessage('bot', response.answer, {
+      related: Array.isArray(response.related) ? response.related : [],
+      note: response.source === 'gemini' ? 'คำตอบจาก AI โปรดตรวจสอบกับวิทยาลัยอีกครั้ง' : '',
+      time: toText(response.time) || nowTime(),
+      retry: retryable
+    });
+    if (Array.isArray(response.suggestions) && response.suggestions.length) {
+      renderSuggestions(response.suggestions.map(toText).filter(Boolean));
+    }
+  }
+
+  function sendMessage(rawText, options) {
+    const question = toText(rawText);
+    const isRetry = Boolean(options && options.retry);
+    if (!question) {
+      return;
+    }
+    if (state.busy) {
+      showToast('น้อง NICC กำลังตอบคำถามก่อนหน้า รอสักครู่นะครับ');
+      return;
+    }
+
+    state.busy = true;
+    state.lastQuestion = question;
+    setChatBusy(true);
+    if (!isRetry) {
+      appendMessage('user', question);
+    }
+    const typing = appendTyping();
+    const requestId = ++state.requestId;
+    let settled = false;
+
+    function settle(handler) {
+      if (settled || requestId !== state.requestId) {
+        return;
+      }
+      settled = true;
+      window.clearTimeout(timer);
+      if (typing && typing.parentNode) {
+        typing.parentNode.removeChild(typing);
+      }
+      state.busy = false;
+      setChatBusy(false);
+      handler();
+    }
+
+    const timer = window.setTimeout(function () {
+      settle(function () {
+        showChatError('น้อง NICC ตอบช้ากว่าปกติครับ ลองส่งอีกครั้งนะครับ');
+      });
+    }, AI_TIMEOUT_MS);
+
+    callServer('askAI', [question, state.sessionId], function (response) {
+      settle(function () {
+        handleAiResponse(response);
+      });
+    }, function (error) {
+      settle(function () {
+        console.error('[NICC] askAI failed', error);
+        showChatError();
+      });
+    });
+  }
+
+  function askFromAnywhere(prompt) {
+    closeSheet();
+    showPage('chat');
+    sendMessage(prompt);
+  }
+
+  /* ==========================================================
+   * 13. EVENTS (Event Delegation - ผูกครั้งเดียว)
+   * ========================================================== */
+
+  const CLICK_SELECTOR = [
+    '#backBtn',
+    '#sheetClose',
+    '[data-prompt]',
+    '[data-route]',
+    '[data-action]',
+    '[data-program-id]',
+    '[data-news-id]',
+    '[data-chip]',
+    '[data-suggest]',
+    '[data-retry-chat]',
+    '[data-clear-filters]',
+    '[data-career-answer]'
+  ].join(',');
+
+  function handleAction(button) {
+    const action = button.getAttribute('data-action');
+    if (action === 'apply') {
+      openExternal(state.settings.admissionsUrl, 'ยังไม่ได้ตั้งค่าลิงก์สมัครเรียน สอบถามน้อง NICC หรือติดต่อวิทยาลัยได้ครับ');
+    } else if (action === 'apply-status') {
+      openExternal(state.settings.admissionsStatusUrl, 'ยังไม่ได้ตั้งค่าลิงก์ตรวจสอบสถานะ สอบถามน้อง NICC หรือติดต่อวิทยาลัยได้ครับ');
+    } else if (action === 'career-start' || action === 'career-restart') {
+      startCareer();
+    } else if (action === 'career-back') {
+      handleCareerBack();
+    } else if (action === 'career-retry') {
+      submitCareer();
+    } else if (action === 'career-share') {
+      shareCareerCard();
+    } else if (action === 'career-save') {
+      saveCareerCard();
+    } else if (action === 'coming-soon') {
+      showToast((button.getAttribute('data-label') || 'ฟังก์ชันนี้') + ' ยังไม่เปิดให้ใช้งานครับ');
+    } else if (action === 'retry-bootstrap') {
+      loadBootstrap();
+    }
+  }
+
+  function clearProgramFilters() {
+    state.programQuery = '';
+    state.programCategory = '';
+    const input = byId('programSearch');
+    if (input) {
+      input.value = '';
+    }
+    renderProgramChips();
+    renderPrograms();
+  }
+
+  function onDocumentClick(event) {
+    if (event.target && event.target.id === 'sheetBackdrop') {
+      closeSheet();
+      return;
+    }
+    const target = event.target.closest(CLICK_SELECTOR);
+    if (!target) {
+      return;
+    }
+
+    if (target.id === 'backBtn') {
+      goBack();
+    } else if (target.id === 'sheetClose') {
+      closeSheet();
+    } else if (target.hasAttribute('data-prompt')) {
+      askFromAnywhere(target.getAttribute('data-prompt'));
+    } else if (target.hasAttribute('data-suggest')) {
+      sendMessage(target.getAttribute('data-suggest'));
+    } else if (target.hasAttribute('data-retry-chat')) {
+      target.remove();
+      sendMessage(state.lastQuestion, { retry: true });
+    } else if (target.hasAttribute('data-program-id')) {
+      openProgramSheet(target.getAttribute('data-program-id'));
+    } else if (target.hasAttribute('data-news-id')) {
+      openNewsSheet(target.getAttribute('data-news-id'));
+    } else if (target.hasAttribute('data-chip')) {
+      state.programCategory = target.getAttribute('data-chip');
+      renderProgramChips();
+      renderPrograms();
+    } else if (target.hasAttribute('data-career-answer')) {
+      answerCareer(Number(target.getAttribute('data-career-answer')));
+    } else if (target.hasAttribute('data-clear-filters')) {
+      clearProgramFilters();
+    } else if (target.hasAttribute('data-action')) {
+      handleAction(target);
+    } else if (target.hasAttribute('data-route')) {
+      showPage(target.getAttribute('data-route'));
+    }
+  }
+
+  function onDocumentKeydown(event) {
+    if (event.key === 'Escape') {
+      closeSheet();
+    }
+  }
+
+  function onChatSubmit(event) {
+    event.preventDefault();
+    const input = byId('chatInput');
+    if (!input || state.busy || !toText(input.value)) {
+      return;
+    }
+    const text = input.value;
+    input.value = '';
+    sendMessage(text);
+  }
+
+  function onHomeSearch(event) {
+    event.preventDefault();
+    const input = byId('homeSearch');
+    state.programQuery = input ? toText(input.value) : '';
+    state.programCategory = '';
+    const programInput = byId('programSearch');
+    if (programInput) {
+      programInput.value = state.programQuery;
+    }
+    renderProgramChips();
+    renderPrograms();
+    showPage('programs');
+  }
+
+  function onProgramSearchInput(event) {
+    state.programQuery = event.target.value;
+    renderPrograms();
+  }
+
+  function bindEvents() {
+    document.addEventListener('click', onDocumentClick);
+    document.addEventListener('keydown', onDocumentKeydown);
+
+    const chatForm = byId('chatForm');
+    if (chatForm) {
+      chatForm.addEventListener('submit', onChatSubmit);
+    }
+    const homeForm = byId('homeSearchForm');
+    if (homeForm) {
+      homeForm.addEventListener('submit', onHomeSearch);
+    }
+    const programForm = byId('programSearchForm');
+    if (programForm) {
+      programForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+      });
+    }
+    const programInput = byId('programSearch');
+    if (programInput) {
+      programInput.addEventListener('input', onProgramSearchInput);
+    }
+  }
+
+  /* ==========================================================
+   * 14. INIT
+   * ========================================================== */
+
+  function init() {
+    state.sessionId = loadSessionId();
+    bindEvents();
+    watchViewport();
+    appendMessage(
+      'bot',
+      'สวัสดีครับ! น้อง NICC พร้อมช่วยตอบเรื่องหลักสูตร การสมัครเรียน และแนะแนวอาชีพ เลือกคำถามด้านล่างหรือพิมพ์ถามได้เลยครับ'
+    );
+    loadBootstrap();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
