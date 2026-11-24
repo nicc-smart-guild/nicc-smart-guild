@@ -1,596 +1,123 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+  <base target="_top">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0B2E8A">
-  <title>NICC Smart PR — วิทยาลัยการอาชีพนครศรีธรรมราช</title>
+  <title>NICC Smart Guild — วิทยาลัยการอาชีพนครศรีธรรมราช</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;800;900&family=Sarabun:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <a class="skip-link" href="#view">ข้ามไปยังเนื้อหาหลัก</a>
 
-  <!-- ============ SVG Sprite (ครบทุก ID ที่ scripts.js และ styles.css เรียกใช้) ============ -->
-  <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+  <!-- ============ SVG Sprite: NICC Custom Icon Family (24x24, เส้นโค้งมน, เน้นสีด้วย .ac) ============ -->
+  <svg class="svg-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <symbol id="mascot-silhouette" viewBox="0 0 120 120">
-        <rect x="26" y="22" width="68" height="54" rx="22" fill="currentColor" opacity="0.25"/>
-        <rect x="34" y="32" width="52" height="32" rx="14" fill="currentColor" opacity="0.45"/>
-        <circle cx="48" cy="48" r="5" fill="#FFFFFF"/>
-        <circle cx="72" cy="48" r="5" fill="#FFFFFF"/>
-        <path d="M52 56c4 4 12 4 16 0" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" fill="none"/>
-        <line x1="60" y1="10" x2="60" y2="22" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="60" cy="9" r="5" fill="#FFC629"/>
-        <path d="M36 82h48c6 0 10 5 10 11v15H26V93c0-6 4-11 10-11z" fill="currentColor" opacity="0.3"/>
-      </symbol>
-
-      <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V19a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9.5"/><path stroke="var(--ic-accent, #FFC629)" d="M10 20v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/>
-      </symbol>
-      <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M5 4.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-6l-4.5 3.5V16.5H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"/><path stroke="var(--ic-accent, #FFC629)" d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01" stroke-width="2.6"/>
-      </symbol>
-      <symbol id="i-programs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 9 12 4.5 21 9l-9 4.5z"/><path d="M6.5 11.5V16c0 1.4 2.5 2.8 5.5 2.8s5.5-1.4 5.5-2.8v-4.5"/><path stroke="var(--ic-accent, #FFC629)" d="M21 9v5.5"/>
-      </symbol>
-      <symbol id="i-admission" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path stroke="var(--ic-accent, #FFC629)" d="M8.5 13h7M8.5 16.5h4.5"/>
-      </symbol>
-      <symbol id="i-parent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-3.2 2.6-5 5.5-5s5 1.8 5.5 5"/><circle stroke="var(--ic-accent, #FFC629)" cx="17" cy="9.5" r="2.2"/><path stroke="var(--ic-accent, #FFC629)" d="M16 14.3c2.6-.2 4.4 1.3 4.9 4.2"/>
-      </symbol>
-      <symbol id="i-news" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 10v4a1 1 0 0 0 1 1h2l8 4V5L7 9H5a1 1 0 0 0-1 1z"/><path d="M7.5 15l1 4.5h2.2"/><path stroke="var(--ic-accent, #FFC629)" d="M18.5 9.5a4 4 0 0 1 0 5"/>
-      </symbol>
-      <symbol id="i-contact" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6.6 3.5h2.7l1.5 4-2 1.3a10 10 0 0 0 5.4 5.4l1.3-2 4 1.5v2.7a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/><path stroke="var(--ic-accent, #FFC629)" d="M14.5 4.5a5 5 0 0 1 5 5"/>
-      </symbol>
-      <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="5" width="18" height="14" rx="2"/><path stroke="var(--ic-accent, #FFC629)" d="m3 7 9 6 9-6"/>
-      </symbol>
-      <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path stroke="var(--ic-accent, #FFC629)" d="M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18z"/>
-      </symbol>
-      <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="9"/><path stroke="var(--ic-accent, #FFC629)" d="M12 11v5M12 8h.01"/>
-      </symbol>
-      <symbol id="i-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle stroke="var(--ic-accent, #FFC629)" cx="12" cy="10" r="2.4"/>
-      </symbol>
-      <symbol id="i-opportunities" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 3.5a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V17h5.2v-.7c0-.8.4-1.5 1-2A6 6 0 0 0 12 3.5z"/><path d="M10 20.5h4"/><path stroke="var(--ic-accent, #FFC629)" d="M12 7.5v3.5"/>
-      </symbol>
-      <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path stroke="var(--ic-accent, #FFC629)" d="M8 14h.01M12 14h.01M16 14h.01M8 17.2h.01M12 17.2h.01" stroke-width="2.6"/>
-      </symbol>
-      <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="10.5" cy="10.5" r="6.5"/><path stroke="var(--ic-accent, #FFC629)" d="m15.5 15.5 5 5"/>
-      </symbol>
-      <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M19 12H5"/><path stroke="var(--ic-accent, #FFC629)" d="m11 6-6 6 6 6"/>
-      </symbol>
-      <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 3 10.5 13.5"/><path stroke="var(--ic-accent, #FFC629)" d="m21 3-6.5 18-4-7.5L3 9.5z"/>
-      </symbol>
-      <symbol id="i-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 3.5 21.5 20h-19z"/><path stroke="var(--ic-accent, #FFC629)" d="M12 10v4.5M12 17.5h.01"/>
-      </symbol>
-      <symbol id="i-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="9"/><path stroke="var(--ic-accent, #FFC629)" d="m9 9 6 6M15 9l-6 6"/>
-      </symbol>
-      <symbol id="i-more" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="4" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.8"/><rect stroke="var(--ic-accent, #FFC629)" x="13.5" y="13.5" width="6.5" height="6.5" rx="1.8"/>
-      </symbol>
-      <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="m6 6 12 12"/><path stroke="var(--ic-accent, #FFC629)" d="m18 6-12 12"/>
-      </symbol>
-      <symbol id="i-skills" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="9" cy="9" r="2.5"/><path d="M9 3.5v2M9 12.5v2M3.5 9h2M12.5 9h2"/><path stroke="var(--ic-accent, #FFC629)" d="M12 20v-3M16 20v-6M20 20V9"/>
-      </symbol>
-      <symbol id="i-community" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="7.5" r="3"/><path d="M6.5 20c.4-3.6 2.5-5.6 5.5-5.6s5.1 2 5.5 5.6"/><circle stroke="var(--ic-accent, #FFC629)" cx="4.8" cy="10.5" r="2"/><circle stroke="var(--ic-accent, #FFC629)" cx="19.2" cy="10.5" r="2"/>
-      </symbol>
+      <linearGradient id="mgBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9E6FA"/></linearGradient>
+      <linearGradient id="mgFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#17358F"/><stop offset="1" stop-color="#071F63"/></linearGradient>
+      <linearGradient id="mgBlue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A6BFF"/><stop offset="1" stop-color="#0B2E8A"/></linearGradient>
+      <filter id="mgGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
     </defs>
+
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V19a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9.5"/><path class="ac" d="M10 20v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 4.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-6l-4.5 3.5V16.5H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"/><path class="ac" d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01" stroke-width="2.6"/></symbol>
+    <symbol id="i-programs" viewBox="0 0 24 24"><path d="M3 9 12 4.5 21 9l-9 4.5z"/><path d="M6.5 11.5V16c0 1.4 2.5 2.8 5.5 2.8s5.5-1.4 5.5-2.8v-4.5"/><path class="ac" d="M21 9v5.5"/></symbol>
+    <symbol id="i-admission" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path class="ac" d="M8.5 13h7M8.5 16.5h4.5"/></symbol>
+    <symbol id="i-parent" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-3.2 2.6-5 5.5-5s5 1.8 5.5 5"/><circle class="ac" cx="17" cy="9.5" r="2.2"/><path class="ac" d="M16 14.3c2.6-.2 4.4 1.3 4.9 4.2"/></symbol>
+    <symbol id="i-news" viewBox="0 0 24 24"><path d="M4 10v4a1 1 0 0 0 1 1h2l8 4V5L7 9H5a1 1 0 0 0-1 1z"/><path d="M7.5 15l1 4.5h2.2"/><path class="ac" d="M18.5 9.5a4 4 0 0 1 0 5"/></symbol>
+    <symbol id="i-contact" viewBox="0 0 24 24"><path d="M6.6 3.5h2.7l1.5 4-2 1.3a10 10 0 0 0 5.4 5.4l1.3-2 4 1.5v2.7a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/><path class="ac" d="M14.5 4.5a5 5 0 0 1 5 5"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle class="ac" cx="12" cy="10" r="2.4"/></symbol>
+    <symbol id="i-skills" viewBox="0 0 24 24"><circle cx="9" cy="9" r="2.5"/><path d="M9 3.5v2M9 12.5v2M3.5 9h2M12.5 9h2M5.1 5.1l1.4 1.4M11.5 11.5l1.4 1.4M12.9 5.1l-1.4 1.4M6.5 11.5l-1.4 1.4"/><path class="ac" d="M12 20v-3M16 20v-6M20 20V9"/></symbol>
+    <symbol id="i-community" viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="3"/><path d="M6.5 20c.4-3.6 2.5-5.6 5.5-5.6s5.1 2 5.5 5.6"/><circle class="ac" cx="4.8" cy="10.5" r="2"/><circle class="ac" cx="19.2" cy="10.5" r="2"/></symbol>
+    <symbol id="i-tools" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 0 5 5l-1 1-1.5-.3-7.3 7.3a2 2 0 0 1-2.8-2.8l7.3-7.3-.3-1.5z"/><path class="ac" d="M4.5 4.5l4 4M3.5 7l3.5-3.5"/></symbol>
+    <symbol id="i-opportunities" viewBox="0 0 24 24"><path d="M12 3.5a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V17h5.2v-.7c0-.8.4-1.5 1-2A6 6 0 0 0 12 3.5z"/><path d="M10 20.5h4"/><path class="ac" d="M12 7.5v3.5"/></symbol>
+    <symbol id="i-learning" viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5z"/><path class="ac" d="M12 6.5v13"/></symbol>
+    <symbol id="i-certificate" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7.5 8.5h9M7.5 11.5h5"/><path class="ac" d="M15.5 16 14.5 21l2-1.2 2 1.2-1-5"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path class="ac" d="M8 14h.01M12 14h.01M16 14h.01M8 17.2h.01M12 17.2h.01" stroke-width="2.6"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle class="ac" cx="15" cy="7" r="2"/><circle class="ac" cx="9" cy="17" r="2"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path class="ac" d="m15.5 15.5 5 5"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z"/><path class="ac" d="M10 21h4"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5"/><path class="ac" d="m11 6-6 6 6 6"/></symbol>
+    <symbol id="i-forward" viewBox="0 0 24 24"><path d="M5 12h14"/><path class="ac" d="m13 6 6 6-6 6"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10.5 13.5"/><path class="ac" d="m21 3-6.5 18-4-7.5L3 9.5z"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path class="ac" d="M4.5 16v2.5A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5V16"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path class="ac" d="M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></symbol>
+    <symbol id="i-success" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path class="ac" d="m8 12.5 3 3 5-6"/></symbol>
+    <symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 3.5 21.5 20h-19z"/><path class="ac" d="M12 10v4.5M12 17.5h.01"/></symbol>
+    <symbol id="i-error" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path class="ac" d="m9 9 6 6M15 9l-6 6"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16"/><path class="ac" d="M4 17h10"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.8"/><rect class="ac" x="13.5" y="13.5" width="6.5" height="6.5" rx="1.8"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12"/><path class="ac" d="m18 6-12 12"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13"/><path class="ac" d="M10 11v5M14 11v5"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L12 19V5L7.5 9.5z"/><path class="ac" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L12 19V5L7.5 9.5z"/><path class="ac" d="m16 9.5 5 5M21 9.5l-5 5"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"/><path class="ac" d="M12 18v3M9 21h6"/></symbol>
+    <symbol id="i-like" viewBox="0 0 24 24"><path d="M7 11v8H4.5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z"/><path class="ac" d="M7 11l3.5-6.5a1.8 1.8 0 0 1 3.3 1.3L13 9h5.2a1.8 1.8 0 0 1 1.8 2.2l-1.4 6.3a2 2 0 0 1-2 1.5H7"/></symbol>
+    <symbol id="i-love" viewBox="0 0 24 24"><path class="ac" d="M12 20s-7.5-4.6-7.5-10A4.2 4.2 0 0 1 12 7.6 4.2 4.2 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/></symbol>
+    <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9.5h.01M15 9.5h.01" stroke-width="2.6"/><path class="ac" d="M8 14c1 2 2.4 3 4 3s3-1 4-3"/></symbol>
+    <symbol id="i-cry" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9.5h.01M15 9.5h.01" stroke-width="2.6"/><path d="M8.5 16.5c1-1.4 2.2-2 3.5-2s2.5.6 3.5 2"/><path class="ac" d="M8 12.5l-1 2a1.2 1.2 0 1 0 2 0z"/></symbol>
+    <symbol id="i-angry" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 11h.01M15 11h.01" stroke-width="2.6"/><path class="ac" d="m7.5 8 3.5 1.6M16.5 8 13 9.6"/><path d="M8.5 16.5c1-1.4 2.2-1.9 3.5-1.9s2.5.5 3.5 1.9"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path class="ac" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path class="ac" d="m9 5 7 7-7 7"/></symbol>
   </svg>
 
-  <!-- ============ Splash & Global Error ============ -->
-  <div class="splash" id="splash" role="status" aria-live="polite">
-    <figure class="mascot-slot mascot-md" data-mascot="wave">
-      <img class="mascot-img" alt="" hidden>
-      <svg class="mascot-ph" aria-hidden="true"><use href="#mascot-silhouette"/></svg>
-    </figure>
-    <div class="spinner" aria-hidden="true"></div>
-    <strong>กำลังโหลด NICC Smart PR...</strong>
-    <p>กรุณารอสักครู่ น้อง NICC กำลังเตรียมข้อมูลครับ</p>
-  </div>
-
-  <div class="global-error" id="globalError" role="alert" hidden>
-    <svg class="ic ic-xl" aria-hidden="true"><use href="#i-error"/></svg>
-    <h2>เชื่อมต่อระบบไม่สำเร็จ</h2>
-    <p id="globalErrorText">ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่อีกครั้ง</p>
-    <button type="button" class="btn btn-primary" data-action="retry-bootstrap">ลองใหม่</button>
-  </div>
-
-  <!-- ============ App Shell ============ -->
-  <div class="app" id="app" data-initial-page="home" data-current-page="home">
-
-    <!-- Topbar -->
-    <header class="topbar" role="banner">
-      <div class="topbar-inner">
-        <button type="button" class="icon-btn mobile-only" id="backBtn" aria-label="ย้อนกลับ" hidden>
-          <svg class="ic" aria-hidden="true"><use href="#i-back"/></svg>
-        </button>
-
-        <h1 class="topbar-title" id="topbarTitle" hidden></h1>
-
-        <button type="button" class="brand" data-route="home" aria-label="กลับหน้าหลัก">
-          <img class="brand-img" id="brandImg" alt="NICC Smart PR" hidden>
-          <span class="brand-fallback" id="brandFallback">
-            <figure class="mascot-slot mascot-xs" data-mascot="head">
-              <img class="mascot-img" alt="" hidden>
-              <svg class="mascot-ph" aria-hidden="true"><use href="#mascot-silhouette"/></svg>
-            </figure>
-            <span class="brand-word"><b>NICC</b><i>Smart PR</i></span>
-          </span>
-        </button>
-
-        <nav class="desktop-nav" aria-label="เมนูหลัก">
-          <button type="button" data-nav="home" data-route="home">หน้าหลัก</button>
-          <button type="button" data-nav="chat" data-route="chat">ถามน้อง NICC</button>
-          <button type="button" data-nav="programs" data-route="programs">หลักสูตร</button>
-          <button type="button" data-nav="career" data-route="career">แนะแนวอาชีพ</button>
-          <button type="button" data-nav="admissions" data-route="admissions">สมัครเรียน</button>
-          <button type="button" data-nav="parent" data-route="parent">ผู้ปกครอง</button>
-          <button type="button" data-nav="news" data-route="news">ข่าวสาร</button>
-          <button type="button" data-nav="contact" data-route="contact">ติดต่อเรา</button>
-        </nav>
-
-        <div class="topbar-actions">
-          <button type="button" class="btn btn-primary btn-sm topbar-ai" data-route="chat">
-            <svg class="ic ic-sm" aria-hidden="true"><use href="#i-chat"/></svg>
-            <span>ถาม AI</span>
-          </button>
-        </div>
+  <!-- ============ Header ============ -->
+  <header class="site-header" role="banner">
+    <div class="header-in">
+      <a class="brand" href="?page=home" data-nav="home" aria-label="NICC Smart Guild — กลับหน้าหลัก">
+        <span class="brand-mark" data-mascot="head" data-size="46" aria-hidden="true"></span>
+        <span class="brand-text">
+          <span class="brand-name">NICC<em>Smart Guild</em></span>
+          <span class="brand-sub">วิทยาลัยการอาชีพนครศรีธรรมราช</span>
+        </span>
+      </a>
+      <nav class="top-nav" id="top-nav" aria-label="เมนูหลัก">
+        <a href="?page=home" data-nav="home"><svg class="ico sm" aria-hidden="true"><use href="#i-home"/></svg>หน้าหลัก</a>
+        <a href="?page=chat" data-nav="chat"><svg class="ico sm" aria-hidden="true"><use href="#i-chat"/></svg>ถาม AI</a>
+        <a href="?page=programs" data-nav="programs"><svg class="ico sm" aria-hidden="true"><use href="#i-programs"/></svg>หลักสูตร</a>
+        <a href="?page=career" data-nav="career"><svg class="ico sm" aria-hidden="true"><use href="#i-opportunities"/></svg>แนะแนว</a>
+        <a href="?page=admission" data-nav="admission"><svg class="ico sm" aria-hidden="true"><use href="#i-admission"/></svg>สมัครเรียน</a>
+        <a href="?page=parent" data-nav="parent"><svg class="ico sm" aria-hidden="true"><use href="#i-parent"/></svg>ผู้ปกครอง</a>
+        <a href="?page=news" data-nav="news"><svg class="ico sm" aria-hidden="true"><use href="#i-news"/></svg>ข่าวสาร</a>
+        <a href="?page=more" data-nav="more"><svg class="ico sm" aria-hidden="true"><use href="#i-more"/></svg>เพิ่มเติม</a>
+      </nav>
+      <div class="header-tools">
+        <button type="button" class="icon-btn" id="voice-toggle" data-action="voice-toggle" aria-pressed="false" aria-label="เปิดเสียงพูด" title="เปิดเสียงพูด"><svg class="ico" aria-hidden="true" focusable="false"><use id="voice-ico" href="#i-mute"/></svg></button>
+        <a class="icon-btn" href="?page=search" data-nav="search" aria-label="ค้นหา"><svg class="ico" aria-hidden="true"><use href="#i-search"/></svg></a>
+        <a class="icon-btn" href="?page=news" data-nav="news" aria-label="ข่าวสารและการแจ้งเตือน"><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg><span class="dot" id="news-dot" hidden></span></a>
       </div>
-    </header>
-
-    <!-- Demo Banner -->
-    <div class="demo-banner" id="demoBanner" hidden>
-      <svg class="ic ic-sm" aria-hidden="true"><use href="#i-warning"/></svg>
-      <div><strong>โหมดข้อมูลตัวอย่าง:</strong> ข้อมูลบางส่วนกำลังแสดงจากชุดตัวอย่าง สามารถแก้ไขได้ใน Google Sheets</div>
     </div>
+  </header>
 
-    <!-- Main View -->
-    <main class="view" id="view" role="main">
+  <!-- ============ Main ============ -->
+  <main id="app" data-initial-page="home">
+    <div id="view" tabindex="-1" aria-live="polite"></div>
+  </main>
 
-      <!-- 1. HOME -->
-      <section class="page" data-page="home" data-title="หน้าหลัก">
-        <div class="hero">
-          <div class="hero-bg"></div>
-          <div class="hero-copy">
-            <span class="hero-hello">สวัสดีครับ! ยินดีต้อนรับสู่</span>
-            <h2 class="hero-title" data-bind="collegeName">วิทยาลัยการอาชีพนครศรีธรรมราช</h2>
-            <p class="hero-sub" data-bind="tagline">เชื่อมโยงการอาชีพ สู่อนาคตที่ยั่งยืน</p>
-            <div class="hero-cta">
-              <button type="button" class="btn btn-primary" data-route="chat">
-                <svg class="ic ic-sm" aria-hidden="true"><use href="#i-chat"/></svg>
-                คุยกับน้อง NICC
-              </button>
-            </div>
-          </div>
-          <figure class="mascot-slot mascot-hero" data-mascot="wave">
-            <img class="mascot-img" alt="มาสคอตน้อง NICC" hidden>
-            <svg class="mascot-ph" aria-hidden="true"><use href="#mascot-silhouette"/></svg>
-          </figure>
-        </div>
+  <!-- ============ Footer ============ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-in" id="footer-in"></div>
+  </footer>
 
-        <form class="searchbar" id="homeSearchForm" role="search">
-          <svg class="ic ic-sm" aria-hidden="true"><use href="#i-search"/></svg>
-          <label class="sr-only" for="homeSearch">ค้นหาสาขาวิชา</label>
-          <input type="search" id="homeSearch" placeholder="ค้นหาสาขาวิชา เช่น ช่างยนต์ บัญชี ไอที...">
-          <button type="submit" class="btn-icon-round" aria-label="ค้นหา">
-            <svg class="ic ic-sm" aria-hidden="true"><use href="#i-search"/></svg>
-          </button>
-        </form>
+  <!-- ============ Bottom Navigation (มือถือ) ============ -->
+  <nav class="bottom-nav" id="bottom-nav" aria-label="เมนูด้านล่าง">
+    <a href="?page=home" data-nav="home"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg><span>หน้าหลัก</span></a>
+    <a href="?page=chat" data-nav="chat"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg><span>ถาม AI</span></a>
+    <a href="?page=programs" data-nav="programs"><svg class="ico" aria-hidden="true"><use href="#i-programs"/></svg><span>หลักสูตร</span></a>
+    <a href="?page=admission" data-nav="admission"><svg class="ico" aria-hidden="true"><use href="#i-admission"/></svg><span>สมัครเรียน</span></a>
+    <a href="?page=more" data-nav="more"><svg class="ico" aria-hidden="true"><use href="#i-more"/></svg><span>เพิ่มเติม</span></a>
+  </nav>
 
-        <div class="quick-grid">
-          <button type="button" class="quick" data-route="programs">
-            <svg class="ic ic-lg" aria-hidden="true"><use href="#i-programs"/></svg>
-            <span>หลักสูตร</span>
-          </button>
-          <button type="button" class="quick" data-route="career">
-            <svg class="ic ic-lg" aria-hidden="true"><use href="#i-opportunities"/></svg>
-            <span>แนะแนวอาชีพ</span>
-          </button>
-          <button type="button" class="quick" data-route="admissions">
-            <svg class="ic ic-lg" aria-hidden="true"><use href="#i-admission"/></svg>
-            <span>สมัครเรียน</span>
-          </button>
-          <button type="button" class="quick" data-route="parent">
-            <svg class="ic ic-lg" aria-hidden="true"><use href="#i-parent"/></svg>
-            <span>ผู้ปกครอง</span>
-          </button>
-          <button type="button" class="quick" data-route="news">
-            <svg class="ic ic-lg" aria-hidden="true"><use href="#i-news"/></svg>
-            <span>ข่าวสาร</span>
-          </button>
-          <button type="button" class="quick" data-route="contact">
-            <svg class="ic ic-lg" aria-hidden="true"><use href="#i-contact"/></svg>
-            <span>ติดต่อเรา</span>
-          </button>
-        </div>
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+  <div id="modal-root"></div>
 
-        <button type="button" class="banner" data-route="career">
-          <div class="banner-text">
-            <strong>ยังไม่รู้จะเรียนสาขาไหนดี?</strong>
-            <small>ลองทำแบบประเมินความสนใจ 12 ข้อ ค้นหาสาขาที่ใช่สำหรับคุณ</small>
-          </div>
-          <figure class="mascot-slot mascot-sm" data-mascot="idea">
-            <img class="mascot-img" alt="" hidden>
-            <svg class="mascot-ph" aria-hidden="true"><use href="#mascot-silhouette"/></svg>
-          </figure>
-        </button>
+  <noscript>
+    <div style="padding:24px;text-align:center;font-family:sans-serif">กรุณาเปิดใช้งาน JavaScript เพื่อใช้งาน NICC Smart Guild</div>
+  </noscript>
 
-        <div class="section-head">
-          <h3>สาขาวิชายอดนิยม</h3>
-          <button type="button" class="link-btn" data-route="programs">ดูทั้งหมด</button>
-        </div>
-        <div class="hscroll" id="homePrograms"></div>
+  <script src="scripts.js">
 
-        <div class="section-head">
-          <h3>ข่าวสารและกิจกรรม</h3>
-          <button type="button" class="link-btn" data-route="news">ดูทั้งหมด</button>
-        </div>
-        <div class="stack" id="homeNews"></div>
-
-        <ul class="pillars">
-          <li>
-            <svg class="ic ic-lg" aria-hidden="true"><use href="#i-skills"/></svg>
-            <b>เน้นทักษะจริง</b>
-            <small>ลงมือปฏิบัติในห้องแล็บ</small>
-          </li>
-          <li>
-            <svg class="ic ic-lg" aria-hidden="true"><use href="#i-opportunities"/></svg>
-            <b>มีงานทำจริง</b>
-            <small>เชื่อมโยงสถานประกอบการ</small>
-          </li>
-          <li>
-            <svg class="ic ic-lg" aria-hidden="true"><use href="#i-community"/></svg>
-            <b>ดูแลใกล้ชิด</b>
-            <small>ครูแนะแนวคอยให้คำปรึกษา</small>
-          </li>
-          <li>
-            <svg class="ic ic-lg" aria-hidden="true"><use href="#i-programs"/></svg>
-            <b>ต่อยอดได้ไกล</b>
-            <small>ปวช. ปวส. และปริญญาตรี</small>
-          </li>
-        </ul>
-      </section>
-
-      <!-- 2. CHAT (AI Chatbot) -->
-      <section class="page page-chat" data-page="chat" data-title="ถามน้อง NICC" hidden>
-        <div class="chat-head">
-          <figure class="mascot-slot mascot-avatar" data-mascot="head">
-            <img class="mascot-img" alt="" hidden>
-            <svg class="mascot-ph" aria-hidden="true"><use href="#mascot-silhouette"/></svg>
-          </figure>
-          <div>
-            <strong>น้อง NICC — ผู้ช่วยแนะแนว AI</strong>
-            <span class="status"><i class="dot" aria-hidden="true"></i>พร้อมให้คำปรึกษา</span>
-          </div>
-        </div>
-
-        <div class="chat-log" id="chatLog" role="log" aria-live="polite"></div>
-
-        <div class="chat-suggest" id="chatSuggestions"></div>
-
-        <form class="chat-input" id="chatForm">
-          <label class="sr-only" for="chatInput">พิมพ์คำถามถึงน้อง NICC</label>
-          <input type="text" id="chatInput" placeholder="พิมพ์คำถามที่นี่ เช่น อยากเรียนช่างยนต์..." autocomplete="off">
-          <button type="submit" class="btn-icon-round btn-send" id="chatSend" aria-label="ส่งข้อความ">
-            <svg class="ic ic-sm" aria-hidden="true"><use href="#i-send"/></svg>
-          </button>
-        </form>
-      </section>
-
-      <!-- 3. PROGRAMS -->
-      <section class="page" data-page="programs" data-title="หลักสูตรที่เปิดสอน" hidden>
-        <div class="page-hero">
-          <svg class="page-hero-icon" aria-hidden="true"><use href="#i-programs"/></svg>
-          <div>
-            <h2>หลักสูตรที่เปิดสอน</h2>
-            <p>ระดับประกาศนียบัตรวิชาชีพ (ปวช.) และ ปวส.</p>
-          </div>
-        </div>
-
-        <form class="searchbar" id="programSearchForm" role="search">
-          <svg class="ic ic-sm" aria-hidden="true"><use href="#i-search"/></svg>
-          <label class="sr-only" for="programSearch">ค้นหาหลักสูตร</label>
-          <input type="search" id="programSearch" placeholder="ค้นหาชื่อสาขา หรืออาชีพในอนาคต...">
-        </form>
-
-        <div class="chips" id="programChips"></div>
-        <div class="stack" id="programList"></div>
-      </section>
-
-      <!-- 4. CAREER MATCH -->
-      <section class="page" data-page="career" data-title="แนะแนวอาชีพ" hidden>
-        <div id="careerIntro" class="stack">
-          <div class="page-hero page-hero-tall">
-            <div>
-              <h2>ค้นหาสาขาที่ใช่สำหรับคุณ</h2>
-              <p>แบบประเมินความสนใจตามหลัก Holland (RIASEC) 12 ข้อ ใช้เวลาไม่ถึง 2 นาที</p>
-              <span class="hero-lead" data-bind="mascotQuote">น้อง NICC เพื่อนคู่คิดเส้นทางอาชีพของทุกคน</span>
-            </div>
-            <figure class="mascot-slot mascot-md" data-mascot="point">
-              <img class="mascot-img" alt="" hidden>
-              <svg class="mascot-ph" aria-hidden="true"><use href="#mascot-silhouette"/></svg>
-            </figure>
-          </div>
-
-          <div class="card">
-            <strong>สิ่งที่คุณจะได้รับ</strong>
-            <p>• วิเคราะห์บุคลิกความสนใจหลัก 3 อันดับแรกของคุณ</p>
-            <p>• จับคู่สาขาวิชาของวิทยาลัยที่สอดคล้องกับความถนัด</p>
-            <p>• สร้างการ์ดผลแนะแนวสวยงามสำหรับบันทึกหรือแชร์ให้ผู้ปกครอง</p>
-            <button type="button" class="btn btn-primary btn-block" data-action="career-start">เริ่มทำแบบประเมินเลย</button>
-          </div>
-        </div>
-
-        <div id="careerFlow" class="card career-flow" hidden>
-          <div class="section-head">
-            <span class="caption" id="careerProgress">ข้อ 1 จาก 12</span>
-          </div>
-          <div class="progress"><i id="careerBar"></i></div>
-          <h3 id="careerQuestion"></h3>
-          <div class="option-list" id="careerOptions"></div>
-        </div>
-
-        <div id="careerResult" class="card career-result" hidden></div>
-      </section>
-
-      <!-- 5. ADMISSIONS -->
-      <section class="page" data-page="admissions" data-title="การรับสมัครเรียน" hidden>
-        <div class="page-hero">
-          <svg class="page-hero-icon" aria-hidden="true"><use href="#i-admission"/></svg>
-          <div>
-            <h2>สมัครเรียน ปีการศึกษา <span data-bind="academicYear">2569</span></h2>
-            <p>เปิดรับผู้จบ ม.3 (ระดับ ปวช.) และผู้จบ ม.6 / ปวช. (ระดับ ปวส.)</p>
-          </div>
-        </div>
-
-        <div class="steps">
-          <div class="step">
-            <div class="step-no">1</div>
-            <div>
-              <strong>เลือกสาขาวิชา</strong>
-              <p class="card-text">ศึกษาหลักสูตรหรือทำแบบประเมินแนะแนว</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-no">2</div>
-            <div>
-              <strong>เตรียมเอกสาร</strong>
-              <p class="card-text">วุฒิการศึกษา สำเนาบัตรประชาชน ทะเบียนบ้าน รูปถ่าย</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-no">3</div>
-            <div>
-              <strong>ยื่นใบสมัคร</strong>
-              <p class="card-text">สมัครออนไลน์หรือยื่นด้วยตนเองที่วิทยาลัย</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-no">4</div>
-            <div>
-              <strong>รายงานตัว</strong>
-              <p class="card-text">ตรวจสอบรายชื่อและรายงานตัวตามกำหนด</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="btn-stack">
-          <button type="button" class="btn btn-primary btn-block" data-action="apply">สมัครเรียนออนไลน์</button>
-          <button type="button" class="btn btn-outline btn-block" data-action="apply-status">ตรวจสอบสถานะการสมัคร</button>
-          <button type="button" class="btn btn-secondary btn-block" data-prompt="สมัครเรียนต้องเตรียมเอกสารอะไรบ้าง">ถามน้อง NICC เรื่องเอกสารสมัครเรียน</button>
-        </div>
-      </section>
-
-      <!-- 6. PARENT -->
-      <section class="page" data-page="parent" data-title="สำหรับผู้ปกครอง" hidden>
-        <div class="parent-hero">
-          <div class="photo-slot parent-photo" data-photo="parent">
-            <img alt="" hidden>
-          </div>
-          <div class="parent-hero-text">
-            <h2>มุมผู้ปกครอง</h2>
-            <p>ร่วมวางแผนอนาคตและเส้นทางอาชีพที่มั่นคงให้กับบุตรหลาน</p>
-          </div>
-        </div>
-
-        <div class="card note-card">
-          <strong>ทำไมสายอาชีพจึงเป็นทางเลือกที่คุ้มค่า?</strong>
-          <p>• ฝึกทักษะวิชาชีพจริงควบคู่กับความรู้ทางวิชาการ จบแล้วพร้อมทำงานทันที</p>
-          <p>• มีโอกาสฝึกงานในสถานประกอบการจริง และต่อยอดศึกษาต่อระดับปริญญาตรีได้</p>
-          <p>• ลดภาระค่าใช้จ่าย มีกองทุน กยศ. และทุนการศึกษาสนับสนุน</p>
-        </div>
-
-        <div class="cta-ask">
-          <figure class="mascot-slot mascot-sm" data-mascot="tablet">
-            <img class="mascot-img" alt="" hidden>
-            <svg class="mascot-ph" aria-hidden="true"><use href="#mascot-silhouette"/></svg>
-          </figure>
-          <div>
-            <strong>มีข้อสงสัยเรื่องค่าใช้จ่ายหรือการดูแลนักเรียน?</strong>
-            <button type="button" class="btn btn-primary btn-sm" data-prompt="ผู้ปกครองอยากทราบเรื่องค่าใช้จ่ายและทุนการศึกษา">ถามน้อง NICC ได้เลย</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- 7. NEWS -->
-      <section class="page" data-page="news" data-title="ข่าวสารและกิจกรรม" hidden>
-        <div class="page-hero">
-          <svg class="page-hero-icon" aria-hidden="true"><use href="#i-news"/></svg>
-          <div>
-            <h2>ข่าวสารและกิจกรรม</h2>
-            <p>อัปเดตประกาศรับสมัคร กิจกรรม Open House และผลงานนักเรียน</p>
-          </div>
-        </div>
-        <div class="stack" id="newsList"></div>
-      </section>
-
-      <!-- 8. ABOUT -->
-      <section class="page" data-page="about" data-title="เกี่ยวกับวิทยาลัย" hidden>
-        <div class="page-hero">
-          <svg class="page-hero-icon" aria-hidden="true"><use href="#i-home"/></svg>
-          <div>
-            <h2 data-bind="collegeName">วิทยาลัยการอาชีพนครศรีธรรมราช</h2>
-            <p data-bind="collegeNameEn">Nakhon Si Thammarat Industrial and Community Education College</p>
-          </div>
-        </div>
-
-        <div class="card">
-          <p class="slogan" data-bind="slogan">มากกว่าการประชาสัมพันธ์ คือการสร้างโอกาสให้อนาคตที่ยั่งยืน</p>
-          <p>สถานศึกษาสังกัดสำนักงานคณะกรรมการการอาชีวศึกษา (สอศ.) มุ่งเน้นการจัดการเรียนการสอนสายอาชีพเพื่อผลิตและพัฒนากำลังคนให้มีสมรรถนะตรงตามความต้องการของตลาดแรงงานและชุมชน</p>
-          <div class="about-meta caption">
-            <span data-bind="footerMessage">ทักษะดี มีอาชีพ อนาคตดีได้ด้วยกัน</span>
-            <span id="appVersion"></span>
-            <span id="dataSource"></span>
-          </div>
-        </div>
-      </section>
-
-      <!-- 9. CONTACT -->
-      <section class="page" data-page="contact" data-title="ติดต่อเรา" hidden>
-        <div class="page-hero">
-          <svg class="page-hero-icon" aria-hidden="true"><use href="#i-contact"/></svg>
-          <div>
-            <h2>ติดต่อวิทยาลัย</h2>
-            <p>สอบถามข้อมูลการสมัครเรียน หลักสูตร และการแนะแนว</p>
-          </div>
-        </div>
-
-        <div class="stack" id="contactList"></div>
-
-        <div class="card map-card" id="mapCard" hidden>
-          <div class="map-box" id="mapBox"></div>
-        </div>
-
-        <div class="btn-stack">
-          <a class="btn btn-primary btn-block" id="callBtn" href="#" hidden>โทรติดต่อวิทยาลัย</a>
-          <a class="btn btn-outline btn-block" id="mapBtn" href="#" target="_blank" rel="noopener noreferrer" hidden>เปิดแผนที่ใน Google Maps</a>
-        </div>
-      </section>
-
-      <!-- 10. MORE -->
-      <section class="page" data-page="more" data-title="เมนูเพิ่มเติม" hidden>
-        <div class="menu-list">
-          <button type="button" class="menu-item" data-route="career">
-            <span class="menu-ico"><svg class="ic" aria-hidden="true"><use href="#i-opportunities"/></svg></span>
-            <span>แนะแนวอาชีพ (RIASEC)</span>
-          </button>
-          <button type="button" class="menu-item" data-route="admissions">
-            <span class="menu-ico"><svg class="ic" aria-hidden="true"><use href="#i-admission"/></svg></span>
-            <span>การรับสมัครเรียน</span>
-          </button>
-          <button type="button" class="menu-item" data-route="parent">
-            <span class="menu-ico"><svg class="ic" aria-hidden="true"><use href="#i-parent"/></svg></span>
-            <span>ข้อมูลสำหรับผู้ปกครอง</span>
-          </button>
-          <button type="button" class="menu-item" data-route="about">
-            <span class="menu-ico"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></span>
-            <span>เกี่ยวกับวิทยาลัย</span>
-          </button>
-          <button type="button" class="menu-item" data-route="contact">
-            <span class="menu-ico"><svg class="ic" aria-hidden="true"><use href="#i-contact"/></svg></span>
-            <span>ติดต่อเรา / แผนที่</span>
-          </button>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav" id="bottomNav" aria-label="เมนูหลักด้านล่าง">
-      <button type="button" data-nav="home" data-route="home">
-        <svg class="ic" aria-hidden="true"><use href="#i-home"/></svg>
-        <span>หน้าหลัก</span>
-      </button>
-      <button type="button" data-nav="chat" data-route="chat">
-        <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg>
-        <span>ถาม AI</span>
-      </button>
-      <button type="button" data-nav="programs" data-route="programs">
-        <svg class="ic" aria-hidden="true"><use href="#i-programs"/></svg>
-        <span>หลักสูตร</span>
-      </button>
-      <button type="button" data-nav="news" data-route="news">
-        <svg class="ic" aria-hidden="true"><use href="#i-news"/></svg>
-        <span>ข่าวสาร</span>
-      </button>
-      <button type="button" data-nav="more" data-route="more">
-        <svg class="ic" aria-hidden="true"><use href="#i-more"/></svg>
-        <span>เพิ่มเติม</span>
-      </button>
-    </nav>
-
-    <!-- Floating AI Mascot Button -->
-    <button type="button" class="fab-ai" data-route="chat" aria-label="คุยกับน้อง NICC">
-      <figure class="mascot-slot mascot-fab" data-mascot="head">
-        <img class="mascot-img" alt="" hidden>
-        <svg class="mascot-ph" aria-hidden="true"><use href="#mascot-silhouette"/></svg>
-      </figure>
-      <span class="fab-tag">AI</span>
-    </button>
-
-  </div>
-
-  <!-- Detail Sheet Modal -->
-  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
-  <aside class="sheet" id="detailSheet" role="dialog" aria-modal="true" hidden>
-    <div class="sheet-handle"></div>
-    <button type="button" class="icon-btn sheet-close" id="sheetClose" aria-label="ปิดหน้าต่าง">
-      <svg class="ic ic-sm" aria-hidden="true"><use href="#i-close"/></svg>
-    </button>
-    <div id="sheetBody"></div>
-  </aside>
-
-  <!-- Toast -->
-  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-
-  <!-- Templates for Loading / Empty / Error States -->
-  <template id="tplLoading">
-    <div class="skeleton-list" style="grid-column:1/-1">
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-    </div>
-  </template>
-
-  <template id="tplEmpty">
-    <div class="state">
-      <figure class="mascot-slot mascot-sm" data-mascot="head">
-        <img class="mascot-img" alt="" hidden>
-        <svg class="mascot-ph" aria-hidden="true"><use href="#mascot-silhouette"/></svg>
-      </figure>
-      <h3 data-slot="title">ไม่พบข้อมูล</h3>
-      <p data-slot="text">ยังไม่มีรายการในขณะนี้</p>
-      <button type="button" class="btn btn-primary btn-sm" data-slot="action" hidden></button>
-    </div>
-  </template>
-
-  <template id="tplError">
-    <div class="state state-error">
-      <svg class="ic ic-xl" aria-hidden="true"><use href="#i-error"/></svg>
-      <h3 data-slot="title">เกิดข้อผิดพลาด</h3>
-      <p data-slot="text">ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>
-      <button type="button" class="btn btn-primary btn-sm" data-slot="action">ลองใหม่</button>
-    </div>
-  </template>
-
-  <script src="scripts.js"></script>
-</body>
-</html>
