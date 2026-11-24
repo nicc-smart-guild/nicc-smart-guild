@@ -484,6 +484,169 @@ details.acc .acc-body { padding: 0 var(--sp-4) var(--sp-4); color: var(--text-2)
   .brand-sub { display: none; }
   .btn { padding-left: 16px; padding-right: 16px; }
 }
+/* ============================================================
+   NICC Card Quest — แนะแนวแบบเกมการ์ด
+   (วางต่อท้ายไฟล์ styles.css ก่อนบล็อก @media (prefers-reduced-motion) หรือท้ายสุดก็ได้
+    ใช้ตัวแปรสีเดิมของระบบทั้งหมด)
+   ============================================================ */
+
+/* ธีมสีการ์ด: --c1/--c2 = สีกรอบ, --tint = พื้นรูป/มาสคอต */
+.t-blue   { --c1: #2A6BFF; --c2: #0B2E8A; --tint: #E6EEFF; --glow: rgba(22, 85, 255, .55); }
+.t-sky    { --c1: #5CCBFF; --c2: #1688D9; --tint: #E3F3FE; --glow: rgba(62, 183, 247, .6); }
+.t-gold   { --c1: #FFD65C; --c2: #E8A800; --tint: #FFF4D1; --glow: rgba(255, 198, 41, .65); }
+.t-mint   { --c1: #3BD3A6; --c2: #0C8A5E; --tint: #E3F6EE; --glow: rgba(12, 138, 94, .5); }
+.t-rose   { --c1: #FF8FA8; --c2: #C62F43; --tint: #FDECEF; --glow: rgba(255, 107, 138, .55); }
+.t-violet { --c1: #A18BFF; --c2: #4B2FC9; --tint: #EEE9FF; --glow: rgba(139, 107, 255, .55); }
+
+.quest-switch { display: flex; justify-content: flex-end; margin-bottom: var(--sp-3); }
+
+/* เวที (stage) ใช้ภาษาสีเดียวกับ .feature ของหน้าหลัก */
+.quest {
+  position: relative; overflow: hidden; color: #fff;
+  padding: var(--sp-5) var(--sp-4); border-radius: var(--r-lg);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(62, 183, 247, .35), transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(255, 198, 41, .22), transparent 40%),
+    linear-gradient(135deg, var(--navy) 0%, var(--royal) 100%);
+  box-shadow: var(--sh-2);
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+.quest h2 { color: #fff; margin: 0 0 var(--sp-2); }
+.quest h2:focus, .quest h2:focus-visible { outline: none; box-shadow: none; }
+.quest p { color: rgba(255, 255, 255, .9); }
+.quest .btn { touch-action: manipulation; }
+.quest .btn-lg { min-height: 60px; padding: 12px 30px; font-size: var(--fs-md); }
+.quest .btn-quiet { color: rgba(255, 255, 255, .85); }
+.quest .btn-quiet:hover { background: rgba(255, 255, 255, .12); box-shadow: none; }
+.qbadge { display: inline-block; padding: 3px 14px; border-radius: var(--r-pill); font-family: var(--font-head); font-weight: 800; font-size: var(--fs-xs); letter-spacing: .04em; background: rgba(255, 255, 255, .16); color: #fff; border: 1px solid rgba(255, 255, 255, .35); margin-bottom: var(--sp-3); }
+.qbadge-gold { background: var(--warm); color: var(--navy-900); border-color: transparent; }
+
+/* ---- 1) หน้าเปิดเกม ---- */
+.quest-intro { display: grid; gap: var(--sp-4); text-align: center; justify-items: center; padding: var(--sp-6) var(--sp-4); }
+.quest-intro .btn-row { justify-content: center; }
+.qi-art { position: relative; width: 220px; display: grid; place-items: center; padding-top: 10px; }
+.qi-art .mascot { position: relative; z-index: 1; width: 170px; }
+.qi-deck { position: absolute; inset: 0; }
+.qi-deck i { position: absolute; top: 16px; width: 92px; height: 124px; border-radius: 16px; border: 4px solid #fff; background: linear-gradient(145deg, var(--c1), var(--c2)); box-shadow: 0 10px 22px rgba(7, 31, 99, .35); }
+.qi-deck i:nth-child(1) { left: 0; transform: rotate(-14deg); }
+.qi-deck i:nth-child(2) { right: 0; transform: rotate(13deg); }
+.qi-deck i:nth-child(3) { left: 64px; top: 6px; transform: rotate(-2deg); opacity: .9; }
+
+/* ---- 2) เลือกการ์ด ---- */
+.q-top { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-2); }
+.q-round { font-family: var(--font-head); font-size: var(--fs-md); }
+.q-pips { display: inline-flex; gap: 6px; margin-left: auto; }
+.q-pips i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, .3); transition: background .2s, transform .2s var(--ease); }
+.q-pips i.done { background: var(--warm); }
+.q-pips i.now { background: #fff; transform: scale(1.35); }
+.quest .progress { background: rgba(255, 255, 255, .2); margin-bottom: var(--sp-4); }
+.quest .progress > i { background: linear-gradient(90deg, var(--warm), #FFE28A); }
+.quest-pick h2 { font-size: clamp(1.35rem, 3.2vw, 1.9rem); text-align: center; }
+.q-hint { text-align: center; margin: 0 0 var(--sp-4); font-size: var(--fs-sm); }
+
+.qgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 220px)); justify-content: center; gap: var(--sp-4); padding: var(--sp-2) 0 var(--sp-3); }
+
+/* การ์ด (ปุ่ม) — กรอบไล่สีแบบการ์ดสะสม */
+.qcard {
+  position: relative; display: block; padding: 0; border: 0; background: none; text-align: center; color: var(--text);
+  min-height: 230px; border-radius: 22px; touch-action: manipulation;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  animation: qdeal .5s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 70ms);
+  transition: transform .22s var(--ease), box-shadow .22s var(--ease), opacity .22s, filter .22s;
+}
+@keyframes qdeal { from { opacity: 0; transform: translateY(26px) rotate(-3deg) scale(.92); } to { opacity: 1; transform: none; } }
+.qc-frame {
+  position: relative; display: flex; flex-direction: column; height: 100%; min-height: inherit; padding: 5px; overflow: hidden;
+  border-radius: 22px; background: linear-gradient(145deg, var(--c1), var(--c2));
+  box-shadow: 0 8px 20px rgba(7, 31, 99, .35), inset 0 0 0 2px rgba(255, 255, 255, .35);
+}
+.qc-art {
+  position: relative; display: grid; place-items: center; height: 128px; border-radius: 17px 17px 8px 8px; overflow: hidden;
+  background: radial-gradient(circle at 50% 30%, #fff 0, var(--tint) 70%);
+}
+.qc-art::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(11, 46, 138, .09) 1.5px, transparent 1.5px); background-size: 12px 12px; }
+.qc-art .mascot { position: relative; width: 98px; margin-top: 6px; filter: drop-shadow(0 4px 6px rgba(11, 46, 138, .18)); }
+.qc-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.qc-art img.img-broken { visibility: hidden; }
+.qc-tag { position: absolute; top: 8px; left: 8px; z-index: 2; padding: 1px 10px; border-radius: var(--r-pill); font-family: var(--font-head); font-weight: 900; font-size: .6875rem; letter-spacing: .06em; color: #fff; background: linear-gradient(135deg, var(--c1), var(--c2)); box-shadow: 0 2px 6px rgba(7, 31, 99, .25); }
+.qc-body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 10px 8px 12px; margin-top: 3px; background: #fff; border-radius: 8px 8px 17px 17px; }
+.qc-title { font-family: var(--font-head); font-weight: 800; font-size: 1.0625rem; line-height: 1.3; color: var(--navy); }
+.qc-desc { font-size: var(--fs-xs); line-height: 1.45; color: var(--text-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.qc-check { position: absolute; top: 10px; right: 10px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: var(--ok); border: 3px solid #fff; box-shadow: 0 3px 8px rgba(7, 31, 99, .3); transform: scale(0); }
+.qc-check .ico { --ico-accent: #fff; --s: 20px; stroke-width: 3; }
+
+@media (hover: hover) { .qcard:hover { transform: translateY(-5px); } }
+.qcard:active { transform: scale(.96); }
+.qcard:focus-visible { box-shadow: var(--focus); border-radius: 22px; }
+
+/* สถานะถูกเลือก: ยกขึ้น + เรืองแสง + เครื่องหมายถูก + แสงเงาวิ่งผ่าน; ใบอื่นหรี่ลง */
+.qcard.is-picked { transform: translateY(-8px) scale(1.04); z-index: 2; }
+.qcard.is-picked .qc-frame { box-shadow: 0 0 0 4px #fff, 0 0 30px 6px var(--glow), 0 14px 28px rgba(7, 31, 99, .4); }
+.qcard.is-picked .qc-check { animation: qpop .35s var(--ease) forwards; }
+.qcard.is-picked .qc-frame::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, .55) 50%, transparent 65%); transform: translateX(-120%); animation: qshine .8s .1s ease-out forwards; }
+@keyframes qpop { 0% { transform: scale(0); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
+@keyframes qshine { to { transform: translateX(120%); } }
+.qgrid.has-pick .qcard:not(.is-picked) { opacity: .5; filter: saturate(.6); transform: scale(.96); }
+
+.q-foot { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-3); margin-top: var(--sp-3); }
+
+/* ---- 3) ประมวลผล ---- */
+.quest-think { display: grid; justify-items: center; text-align: center; gap: var(--sp-2); padding: var(--sp-7) var(--sp-4); }
+.quest-think .mascot { width: 150px; }
+.qdots { display: inline-flex; gap: 8px; margin-top: var(--sp-2); }
+.qdots i { width: 12px; height: 12px; border-radius: 50%; background: var(--warm); animation: blink 1.2s infinite; }
+.qdots i:nth-child(2) { animation-delay: .2s; } .qdots i:nth-child(3) { animation-delay: .4s; }
+
+/* ---- 4) สรุปผล ---- */
+.qhero { border-radius: 26px; padding: 6px; background: linear-gradient(145deg, var(--c1), var(--c2)); box-shadow: 0 0 0 4px rgba(255, 255, 255, .85), 0 0 34px 4px var(--glow), 0 16px 34px rgba(7, 31, 99, .4); animation: qdeal .6s var(--ease) backwards; }
+.qh-frame { display: grid; background: #fff; border-radius: 21px; overflow: hidden; color: var(--text); }
+.qh-art { position: relative; display: grid; place-items: center; min-height: 190px; padding: var(--sp-4); background: radial-gradient(circle at 50% 35%, #fff 0, var(--tint) 75%); }
+.qh-art .mascot { position: relative; width: 150px; }
+.qh-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .9; }
+.qh-art img.img-broken { visibility: hidden; }
+.qh-art .mascot { z-index: 1; }
+.qh-body { display: grid; gap: var(--sp-3); padding: var(--sp-5) var(--sp-4); align-content: center; }
+.qh-body h2 { color: var(--navy); margin: 0; font-size: clamp(1.5rem, 3.6vw, 2.1rem); }
+.qh-body .qbadge-gold { justify-self: start; margin: 0; }
+.qh-desc { color: var(--text-2) !important; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.q-sub { color: #fff; margin: var(--sp-5) 0 var(--sp-3); font-size: var(--fs-md); }
+.qminis { display: grid; gap: var(--sp-3); }
+.qmini { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-3); align-items: center; padding: var(--sp-3); border-radius: var(--r-md); background: #fff; color: var(--text); border-left: 8px solid var(--c1); box-shadow: var(--sh-1); }
+.qmini .btn { grid-column: 1 / -1; justify-self: start; }
+.qm-ico { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; color: var(--c2); background: var(--tint); }
+.qm-body h4 { margin: 4px 0 0; font-size: 1.0625rem; }
+.qm-body small { color: var(--text-2); }
+.q-note { margin: var(--sp-4) 0 0; font-size: var(--fs-xs); text-align: center; opacity: .85; }
+.q-empty { display: grid; justify-items: center; text-align: center; gap: var(--sp-2); padding: var(--sp-5) 0; }
+
+/* ---- Responsive (iPad Kiosk: แนวนอน ≥ 900px / แนวตั้ง 560–899px) ---- */
+@media (min-width: 560px) {
+  .quest { padding: var(--sp-6); }
+  .qminis { grid-template-columns: repeat(3, 1fr); }
+  .qmini { grid-template-columns: 1fr; }
+  .qm-ico { width: 48px; height: 48px; }
+}
+@media (min-width: 700px) {
+  .qh-frame { grid-template-columns: 280px 1fr; }
+  .qh-art { min-height: 100%; }
+  .qh-body { padding: var(--sp-6); }
+}
+@media (min-width: 900px) {
+  .quest-intro { grid-template-columns: auto 1fr; text-align: left; justify-items: start; gap: var(--sp-6); padding: var(--sp-7) var(--sp-6); }
+  .quest-intro .btn-row { justify-content: flex-start; }
+  .qi-art { width: 260px; }
+  .qi-art .mascot { width: 200px; }
+  .qi-deck i { width: 108px; height: 146px; }
+  .qi-deck i:nth-child(3) { left: 76px; }
+  .qgrid { grid-template-columns: repeat(auto-fit, minmax(180px, 230px)); }
+  .qcard { min-height: 250px; }
+  .qc-art { height: 140px; }
+}
+@media (max-width: 380px) {
+  .qgrid { grid-template-columns: repeat(2, 1fr); gap: var(--sp-3); }
+  .qc-title { font-size: 1rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
