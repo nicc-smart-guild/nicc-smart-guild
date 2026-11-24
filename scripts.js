@@ -672,6 +672,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
   }
   function onDataReady() {
     renderFooter();
+    setupKiosk();
     var dot = $('#news-dot');
     if (dot) dot.hidden = !(D().news && D().news.length);
     if (state.page === 'chat') return; // ไม่ล้างข้อความที่ผู้ใช้กำลังพิมพ์
@@ -935,7 +936,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       '<div class="banner banner-info" role="note">' + icon('warning', 'sm') + '<span><b>โปรดทราบ:</b> นี่เป็นเครื่องมือช่วยสำรวจความสนใจเบื้องต้นเท่านั้น ไม่ใช่การประเมินความสามารถหรือการรับประกันอาชีพ ระบบจับคู่คำตอบกับหลักสูตรตามที่วิทยาลัยกำหนดไว้ในฐานข้อมูล (ไม่มีการสุ่ม)</span></div>' +
       '<div id="career-body" class="section"></div></div>';
   }
-  function renderCareerBody() {
+  function renderCareerClassic() {
     var box = $('#career-body');
     if (!box) return;
     var Q = D().careerQuestions, c = state.career;
@@ -998,6 +999,323 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     }
     return head + body + '<div class="btn-row" style="margin-top:16px"><button type="button" class="btn btn-ghost" data-action="career-restart">' + icon('back', 'sm') + 'ทำแบบสำรวจใหม่</button>' +
       navBtn('admission', 'ดูการรับสมัคร', 'btn-primary', 'admission') + '</div>';
+  }
+
+  /* ============================================================
+   * NICC Card Quest — แนะแนวแบบเกมการ์ด (iPad Kiosk)
+   * ใช้ข้อมูลเดิม: D().careerQuestions / D().programs / D().departments
+   * ฟิลด์เสริมในแต่ละ option (ไม่จำเป็น): title, desc, image_url, theme
+   * ============================================================ */
+  var QUEST_MAX_ROUNDS = 6;     // จำนวนรอบสูงสุดต่อเกม (1 คำถาม = 1 รอบ)
+  var QUEST_PICK_DELAY = 650;   // ms ที่ค้างให้เห็นการ์ดที่เลือกก่อนไปรอบถัดไป
+  var QUEST_THINK_MS = 1700;    // ms หน้าประมวลผล
+  var QUEST_SECONDARY = 3;      // จำนวนสาขารองที่แสดง
+
+  var QUEST_THEMES = [
+    { key: 'blue',   pose: 'learning',  ico: 'tools' },
+    { key: 'sky',    pose: 'assistant', ico: 'skills' },
+    { key: 'gold',   pose: 'career',    ico: 'opportunities' },
+    { key: 'mint',   pose: 'success',   ico: 'community' },
+    { key: 'rose',   pose: 'welcome',   ico: 'learning' },
+    { key: 'violet', pose: 'thinking',  ico: 'certificate' }
+  ];
+  var QUEST_RULES = [
+    [/ไฟฟ้า|อิเล็ก|วงจร|พลังงาน/, 'gold'],
+    [/คอมพิวเตอร์|โปรแกรม|ดิจิทัล|ไอที|เทคโนโลยี|เครือข่าย/, 'sky'],
+    [/บัญชี|ตัวเลข|เอกสาร|การตลาด|ธุรกิจ|สำนักงาน|ขาย|การเงิน/, 'mint'],
+    [/ซ่อม|เครื่องยนต์|เครื่องจักร|ประกอบ|โรงงาน|อู่|ช่างกล|เชื่อม/, 'blue'],
+    [/ออกแบบ|ศิลป|ฝีมือ|สร้างสรรค์|ประดิษฐ์|แฟชั่น|อาหาร|ท่องเที่ยว|โรงแรม|ความงาม/, 'rose'],
+    [/วิทยาศาสตร์|ฟิสิกส์|คณิต|วิเคราะห์|ทดลอง|ค้นคว้า/, 'violet']
+  ];
+
+  function freshQuest(mode, step) {
+    return { mode: mode || 'quest', step: step || 'intro', round: 0, picks: [], lock: false, pickTimer: 0, thinkTimer: 0 };
+  }
+  function questState() { if (!state.quest) state.quest = freshQuest(); return state.quest; }
+  function questClearTimers() {
+    var s = state.quest;
+    if (!s) return;
+    clearTimeout(s.pickTimer); clearTimeout(s.thinkTimer);
+    s.pickTimer = 0; s.thinkTimer = 0; s.lock = false;
+  }
+  function qArr(x) { return Array.isArray(x) ? x.map(String) : []; }
+  function questDeck() {
+    return (D().careerQuestions || []).filter(function (q) { return q && Array.isArray(q.options) && q.options.length; }).slice(0, QUEST_MAX_ROUNDS);
+  }
+  function themeIndex(key) {
+    for (var i = 0; i < QUEST_THEMES.length; i++) if (QUEST_THEMES[i].key === key) return i;
+    return -1;
+  }
+  function questOptTheme(o, idx) {
+    var k = themeIndex(String((o && o.theme) || '').toLowerCase());
+    if (k >= 0) return k;
+    var text = String((o && o.title) || '') + ' ' + String((o && o.label) || '');
+    for (var i = 0; i < QUEST_RULES.length; i++) if (QUEST_RULES[i][0].test(text)) return themeIndex(QUEST_RULES[i][1]);
+    return idx % QUEST_THEMES.length;
+  }
+  /* ให้การ์ดในรอบเดียวกันสีไม่ซ้ำกัน (เท่าที่เป็นไปได้) */
+  function questRoundThemes(q) {
+    var used = {}, L = QUEST_THEMES.length;
+    return q.options.map(function (o, i) {
+      var t = questOptTheme(o, i), n = 0;
+      while (used[t] && n < L) { t = (t + 1) % L; n++; }
+      used[t] = 1;
+      return t;
+    });
+  }
+  function questDeptTheme(deptId) {
+    var list = D().departments || [];
+    for (var i = 0; i < list.length; i++) if (list[i].id === deptId) return i % QUEST_THEMES.length;
+    return 0;
+  }
+  function questLinked(o) {
+    var names = [];
+    qArr(o.programs).forEach(function (id) { var p = programById(id); if (p && p.name) names.push(p.name); });
+    qArr(o.departments).forEach(function (id) { var d = deptById(id); if (d && d.name) names.push(d.name); });
+    names = uniq(names).slice(0, 2);
+    return names.length ? 'แนวทาง: ' + names.join(' • ') : '';
+  }
+
+  /* ---------- คำนวณคะแนน: programs + departments × weight (weight ไม่มี/ผิดรูป = 1) ---------- */
+  function questScore() {
+    var deck = questDeck(), s = questState(), progs = D().programs || [], scores = {}, rounds = {}, why = {}, answered = 0;
+    deck.forEach(function (q, qi) {
+      var ai = s.picks[qi], o = (ai === undefined || ai === null) ? null : q.options[ai];
+      if (!o) return;
+      answered++;
+      var hit = {}, w = Number(o.weight) > 0 ? Number(o.weight) : 1;
+      qArr(o.programs).forEach(function (id) { var p = programById(id); if (p) hit[p.id] = 1; });
+      qArr(o.departments).forEach(function (did) {
+        progs.forEach(function (p) { if (String(p.department_id) === did) hit[p.id] = 1; });
+      });
+      Object.keys(hit).forEach(function (id) {
+        scores[id] = (scores[id] || 0) + w;
+        rounds[id] = (rounds[id] || 0) + 1;
+        (why[id] = why[id] || []).push(o.title || o.label);
+      });
+    });
+    var ranked = Object.keys(scores).map(function (id) {
+      return { p: programById(id), score: scores[id], rounds: rounds[id], why: why[id] };
+    }).filter(function (r) { return r.p; }).sort(function (a, b) {
+      return b.score - a.score || b.rounds - a.rounds || String(a.p.name).localeCompare(String(b.p.name));
+    });
+    return { ranked: ranked, answered: answered, total: deck.length };
+  }
+
+  /* ---------- Render ---------- */
+  function questSwitchBar(toQuest) {
+    return '<div class="quest-switch">' + (toQuest
+      ? '<button type="button" class="btn btn-accent btn-sm" data-action="quest-mode">' + icon('chat', 'sm') + 'สลับไปเล่นโหมดจั่วการ์ด</button>'
+      : '') + '</div>';
+  }
+  function questIntroHtml(n) {
+    return '<section class="quest quest-intro" aria-labelledby="qh">' +
+      '<div class="qi-art"><div class="qi-deck" aria-hidden="true"><i class="t-sky"></i><i class="t-gold"></i><i class="t-blue"></i></div>' + mascot('career', 170, { float: true, deco: true }) + '</div>' +
+      '<div class="qi-text"><span class="qbadge">NICC Card Quest</span>' +
+      '<h2 id="qh" tabindex="-1">จั่วการ์ด ค้นหาสาขาที่ใช่</h2>' +
+      '<p>แตะเลือกการ์ดที่ “ใช่ตัวคุณ” ที่สุดทีละรอบ รวม ' + n + ' รอบ แล้วน้องนิคจะแนะนำสาขาที่เหมาะให้ทันที</p>' +
+      '<div class="btn-row">' +
+      '<button type="button" class="btn btn-accent btn-lg" data-action="quest-start">' + icon('forward', 'sm') + 'เริ่มจั่วการ์ด</button>' +
+      '<button type="button" class="btn btn-ghost" data-action="quest-classic">ตอบแบบคำถามปกติ</button></div></div></section>';
+  }
+  function questCardHtml(o, i, t, picked) {
+    var T = QUEST_THEMES[t], title = o.title || o.label || ('การ์ดใบที่ ' + (i + 1));
+    var desc = o.desc || o.description || ((o.title && o.label && o.title !== o.label) ? o.label : questLinked(o));
+    var img = safeUrl(o.image_url || o.image);
+    return '<button type="button" class="qcard t-' + T.key + (picked ? ' is-picked' : '') + '" role="radio" aria-checked="' + (picked ? 'true' : 'false') + '" data-action="quest-pick" data-idx="' + i + '" style="--i:' + i + '">' +
+      '<span class="qc-frame">' +
+      '<span class="qc-art">' + mascot(T.pose, 104, { deco: true }) +
+      (img ? '<img src="' + esc(img) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '') +
+      '<span class="qc-tag">NICC</span></span>' +
+      '<span class="qc-body"><span class="qc-title">' + esc(title) + '</span>' + (desc ? '<span class="qc-desc">' + esc(desc) + '</span>' : '') + '</span>' +
+      '<span class="qc-check" aria-hidden="true">' + icon('check', 'md') + '</span></span></button>';
+  }
+  function questPickHtml(deck) {
+    var s = questState(), n = deck.length, q = deck[s.round], sel = s.picks[s.round], hasSel = sel !== undefined && sel !== null;
+    var pct = Math.round(((s.round + (hasSel ? 1 : 0)) / n) * 100), themes = questRoundThemes(q);
+    var pips = '';
+    for (var i = 0; i < n; i++) pips += '<i class="' + (i < s.round ? 'done' : (i === s.round ? 'now' : '')) + '"></i>';
+    return '<section class="quest quest-pick" aria-labelledby="qh">' +
+      '<div class="q-top"><b class="q-round">รอบที่ ' + (s.round + 1) + ' จาก ' + n + '</b><span class="q-pips" aria-hidden="true">' + pips + '</span>' + sampleBadge(q) + '</div>' +
+      '<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '"><i style="width:' + pct + '%"></i></div>' +
+      '<h2 id="qh" tabindex="-1">' + esc(q.question) + '</h2><p class="q-hint">แตะการ์ดที่ตรงกับคุณที่สุด 1 ใบ</p>' +
+      '<div class="qgrid' + (hasSel ? ' has-pick' : '') + '" id="qgrid" role="radiogroup" aria-labelledby="qh">' +
+      q.options.map(function (o, idx) { return questCardHtml(o, idx, themes[idx], hasSel && sel === idx); }).join('') + '</div>' +
+      '<div class="q-foot">' +
+      (s.round > 0 ? '<button type="button" class="btn btn-ghost" data-action="quest-prev">' + icon('back', 'sm') + 'ย้อนกลับ</button>' : '<span></span>') +
+      '<button type="button" class="btn btn-quiet q-reset" data-action="quest-restart">เริ่มใหม่</button></div></section>';
+  }
+  function questThinkHtml() {
+    return '<section class="quest quest-think" role="status" aria-live="polite">' + mascot('thinking', 150, { float: true, deco: true }) +
+      '<h2>น้องนิคกำลังจับคู่สาขาให้คุณ…</h2><p>กำลังรวมคะแนนจากการ์ดที่คุณเลือก</p><span class="qdots" aria-hidden="true"><i></i><i></i><i></i></span></section>';
+  }
+  function questResultHtml() {
+    var r = questScore(), foot = '';
+    if (!r.ranked.length) {
+      return '<section class="quest quest-result" aria-labelledby="qh"><div class="q-empty">' + mascot('empty', 120, { deco: true }) +
+        '<h2 id="qh" tabindex="-1">ยังไม่พบสาขาที่ผูกกับการ์ดที่เลือก</h2><p>ข้อมูลการจับคู่อาจยังไม่ครบ ลองเล่นอีกครั้ง ดูหลักสูตรทั้งหมด หรือสอบถามน้องนิคได้เลย</p>' +
+        '<div class="btn-row" style="justify-content:center">' +
+        '<button type="button" class="btn btn-accent" data-action="quest-replay">' + icon('back', 'sm') + 'เล่นใหม่</button>' +
+        navBtn('programs', 'ดูหลักสูตรทั้งหมด', 'btn-ghost', 'programs') + '</div></div></section>';
+    }
+    var top = r.ranked[0], p = top.p, dept = deptById(p.department_id), T = QUEST_THEMES[questDeptTheme(p.department_id)];
+    var img = safeUrl(dept && dept.image_url);
+    var ask = 'อยากรู้เรื่องสาขา ' + p.name + ' เรียนอะไรบ้าง จบแล้วทำงานอะไรได้ และสมัครอย่างไร';
+    var hero = '<article class="qhero t-' + T.key + '"><div class="qh-frame">' +
+      '<div class="qh-art">' + mascot('success', 150, { deco: true }) + (img ? '<img src="' + esc(img) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '') + '<span class="qc-tag">อันดับ 1</span></div>' +
+      '<div class="qh-body"><span class="qbadge qbadge-gold">สาขาที่แนะนำสำหรับคุณ</span>' +
+      '<div class="meta-row">' + (dept ? '<span class="badge">' + esc(dept.name) + '</span>' : '') + (p.level ? '<span class="badge badge-muted">' + esc(p.level) + '</span>' : '') + sampleBadge(p) + '</div>' +
+      '<h2 id="qh" tabindex="-1">' + esc(p.name) + '</h2>' +
+      (p.description ? '<p class="qh-desc">' + esc(p.description) + '</p>' : '') +
+      '<div class="reason"><b>ทำไมจึงแนะนำ:</b> ตรงกับ ' + top.rounds + ' จาก ' + r.answered + ' รอบ — คุณเลือก “' + top.why.map(esc).join('” และ “') + '”</div>' +
+      '<div class="btn-row">' +
+      '<button type="button" class="btn btn-primary" data-action="program" data-id="' + esc(p.id) + '">' + icon('programs', 'sm') + 'ดูหลักสูตร</button>' +
+      '<button type="button" class="btn btn-accent" data-action="ask-about" data-text="' + esc(ask) + '">' + icon('chat', 'sm') + 'ถามน้องนิคเรื่องสาขานี้</button>' +
+      '<button type="button" class="btn btn-ghost" data-action="quest-replay">' + icon('back', 'sm') + 'เล่นใหม่</button></div></div></div></article>';
+    var rest = r.ranked.slice(1, 1 + QUEST_SECONDARY);
+    if (rest.length) {
+      foot = '<h3 class="q-sub">สาขารองที่น่าสนใจ</h3><div class="qminis">' + rest.map(function (x) {
+        var d = deptById(x.p.department_id), t = QUEST_THEMES[questDeptTheme(x.p.department_id)];
+        return '<article class="qmini t-' + t.key + '"><span class="qm-ico">' + icon(t.ico, 'md') + '</span><div class="qm-body">' +
+          (d ? '<span class="badge">' + esc(d.name) + '</span>' : '') + '<h4>' + esc(x.p.name) + '</h4>' +
+          '<small>ตรงกับ ' + x.rounds + ' จาก ' + r.answered + ' รอบ</small></div>' +
+          '<button type="button" class="btn btn-ghost btn-sm" data-action="program" data-id="' + esc(x.p.id) + '">ดูหลักสูตร' + icon('forward', 'sm') + '</button></article>';
+      }).join('') + '</div>';
+    }
+    return '<section class="quest quest-result" aria-labelledby="qh">' + hero + foot +
+      '<p class="q-note">ผลนี้เป็นเพียงข้อเสนอแนะเบื้องต้นจากความสนใจที่คุณเลือก ไม่ใช่การประเมินความสามารถ</p></section>';
+  }
+
+  /* ---------- ตัวควบคุมหลัก (แทนที่ชื่อเดิม renderCareerBody; ของเดิมถูกเปลี่ยนชื่อเป็น renderCareerClassic) ---------- */
+  function renderCareerBody() {
+    var box = $('#career-body');
+    if (!box) return;
+    var s = questState(), deck = questDeck();
+    if (s.mode !== 'quest' || !deck.length) {
+      renderCareerClassic();
+      if (deck.length) box.insertAdjacentHTML('afterbegin', questSwitchBar(true));
+      return;
+    }
+    if (s.round >= deck.length || s.round < 0) { s.round = 0; s.picks = []; }
+    if (s.step === 'processing' && !s.thinkTimer) questThink();
+    if (s.step === 'result' && !s.picks.length) s.step = 'intro';
+    box.innerHTML = s.step === 'pick' ? questPickHtml(deck)
+      : s.step === 'processing' ? questThinkHtml()
+      : s.step === 'result' ? questResultHtml()
+      : questIntroHtml(deck.length);
+  }
+  function questFocus(scrollTop) {
+    var h = $('#qh'), box = $('#career-body');
+    try { if (h) h.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+    if (scrollTop && box) {
+      var top = box.getBoundingClientRect().top;
+      if (top < 0) { try { window.scrollTo(0, window.pageYOffset + top - 80); } catch (e) { /* ignore */ } }
+    }
+  }
+  function questShow(scrollTop) {
+    if (state.page !== 'career') return;
+    renderCareerBody();
+    questFocus(scrollTop);
+  }
+  function questThink() {
+    var s = questState();
+    clearTimeout(s.thinkTimer);
+    s.thinkTimer = setTimeout(function () {
+      if (state.quest !== s) return;
+      s.thinkTimer = 0;
+      if (s.step === 'processing') { s.step = 'result'; questShow(true); }
+    }, QUEST_THINK_MS);
+  }
+  function questStart() {
+    questClearTimers();
+    state.quest = freshQuest('quest', 'pick');
+    questShow(true);
+  }
+  function questPick(idx) {
+    var s = questState(), q = questDeck()[s.round];
+    if (s.step !== 'pick' || s.lock || !q || !q.options[idx]) return;
+    s.picks[s.round] = idx;
+    s.picks.length = s.round + 1;
+    s.lock = true;
+    var grid = $('#qgrid');
+    if (grid) {
+      grid.classList.add('has-pick');
+      $$('.qcard', grid).forEach(function (c, i) {
+        var on = i === idx;
+        c.classList.toggle('is-picked', on);
+        c.setAttribute('aria-checked', on ? 'true' : 'false');
+      });
+    }
+    clearTimeout(s.pickTimer);
+    s.pickTimer = setTimeout(function () {
+      if (state.quest !== s) return;
+      s.pickTimer = 0; s.lock = false;
+      if (s.round + 1 >= questDeck().length) { s.step = 'processing'; questThink(); } else { s.round++; }
+      questShow(true);
+    }, QUEST_PICK_DELAY);
+  }
+  function questPrev() {
+    var s = questState();
+    if (s.step !== 'pick' || s.round <= 0) return;
+    clearTimeout(s.pickTimer); s.pickTimer = 0; s.lock = false;
+    s.round--;
+    s.picks.length = s.round + 1;
+    questShow(false);
+  }
+  function questRestart(step) {
+    questClearTimers();
+    state.quest = freshQuest('quest', step || 'intro');
+    questShow(true);
+  }
+
+  /* ---------- Kiosk: รีเซ็ตเกม/หน้าเว็บเมื่อระบบสั่งหรือไม่มีการใช้งาน ----------
+   * ทางที่ระบบภายนอกสั่งรีเซ็ตได้:
+   *   1) document.dispatchEvent(new CustomEvent('nicc:kiosk-reset'))   → รีเซ็ตทุกอย่างและกลับหน้าหลัก
+   *   2) window.NICCKiosk.reset()                                      → เหมือนข้อ 1
+   *   3) window.NICCKiosk.resetQuest()                                 → รีเซ็ตเฉพาะเกม
+   * ตั้งเวลาไม่มีการใช้งานอัตโนมัติ (ไม่บังคับ): ชีต Settings คีย์ kiosk_idle_seconds (≥ 15) หรือ window.NICC_KIOSK_IDLE_SEC
+   */
+  var kiosk = { bound: false, timer: 0 };
+  function resetQuest() {
+    questClearTimers();
+    state.quest = freshQuest();
+    if (state.page === 'career') renderCareerBody();
+  }
+  function kioskReset() {
+    questClearTimers();
+    state.quest = freshQuest();
+    state.career = { i: 0, answers: [], done: false };
+    state.programs = { q: '', dept: '', level: '' };
+    state.newsCat = '';
+    state.chat = { messages: [], busy: false, sessionId: makeSession(), prefill: '' };
+    closeModal(); abortListening(); stopSpeaking();
+    navigate('home', {}, { push: false });
+  }
+  function kioskSeconds() {
+    var v = Number(window.NICC_KIOSK_IDLE_SEC || (D().settings || {}).kiosk_idle_seconds);
+    return v >= 15 ? Math.min(v, 3600) : 0;
+  }
+  function kioskArm() {
+    clearTimeout(kiosk.timer);
+    var sec = kioskSeconds();
+    if (sec) kiosk.timer = setTimeout(kioskIdle, sec * 1000);
+  }
+  function kioskIdle() {
+    var untouched = state.page === 'home' && !state.chat.messages.length && questState().step === 'intro' && !$('.modal');
+    if (!untouched) {
+      try { document.dispatchEvent(new CustomEvent('nicc:kiosk-reset', { detail: { reason: 'idle' } })); } catch (e) { kioskReset(); }
+    }
+    kioskArm();
+  }
+  function setupKiosk() {
+    if (!kiosk.bound) {
+      kiosk.bound = true;
+      document.addEventListener('nicc:kiosk-reset', kioskReset);
+      ['pointerdown', 'touchstart', 'keydown'].forEach(function (ev) { document.addEventListener(ev, kioskArm, { passive: true }); });
+      window.addEventListener('pageshow', function (e) { if (e.persisted) resetQuest(); });   // กลับมาจาก bfcache
+      window.NICCKiosk = { reset: kioskReset, resetQuest: resetQuest };
+    }
+    kioskArm();
   }
 
   /* ---------- Admission ---------- */
@@ -1510,6 +1828,14 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
         state.career = { i: 0, answers: [], done: false };
         renderCareerBody();
         break;
+      /* ---- NICC Card Quest ---- */
+      case 'quest-start': questStart(); break;
+      case 'quest-pick': questPick(Number(el.getAttribute('data-idx'))); break;
+      case 'quest-prev': questPrev(); break;
+      case 'quest-restart': questRestart('intro'); break;
+      case 'quest-replay': questRestart('pick'); break;
+      case 'quest-classic': questClearTimers(); questState().mode = 'classic'; renderCareerBody(); break;
+      case 'quest-mode': questClearTimers(); state.quest = freshQuest('quest', 'intro'); renderCareerBody(); break;
       default: break;
     }
   }
