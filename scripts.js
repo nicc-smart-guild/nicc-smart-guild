@@ -1,4 +1,3 @@
-<script>
 (function () {
   'use strict';
 
@@ -11,6 +10,9 @@
   /* ==========================================================
    * 1. CONSTANTS & STATE
    * ========================================================== */
+
+  // วาง URL ของ Google Apps Script Web App ที่ Deploy แล้วตรงนี้ (ลงท้ายด้วย /exec)
+  const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYCLZvxX8R-E0R2H0t2P7w7uG2Pjw1JTxFOxigtsAGWAP4Ho/exec';
 
   const SVG_NS = 'http://www.w3.org/2000/svg';
   const PAGES = ['home', 'chat', 'programs', 'career', 'admissions', 'parent', 'news', 'about', 'contact', 'more'];
@@ -164,18 +166,51 @@
   }
 
   /* ==========================================================
-   * 3. SERVER BRIDGE (google.script.run)
+   * 3. SERVER BRIDGE (GitHub Pages -> Google Apps Script API)
    * ========================================================== */
 
   function callServer(functionName, args, onSuccess, onFailure) {
-    try {
-      const runner = google.script.run
-        .withSuccessHandler(onSuccess)
-        .withFailureHandler(onFailure);
-      runner[functionName].apply(runner, args);
-    } catch (error) {
-      onFailure(error);
+    // กรณีรันอยู่บน Google Apps Script โดยตรง ยังรองรับ google.script.run
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      try {
+        const runner = google.script.run
+          .withSuccessHandler(onSuccess)
+          .withFailureHandler(onFailure);
+        runner[functionName].apply(runner, args);
+      } catch (error) {
+        onFailure(error);
+      }
+      return;
     }
+
+    // กรณีรันอยู่บน GitHub Pages เรียกผ่าน fetch() ไปยัง Google Apps Script Web App
+    if (!GAS_API_URL || GAS_API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+      onFailure('กรุณาใส่ลิงก์ Web App URL ของ Google Apps Script ในตัวแปร GAS_API_URL ในไฟล์ scripts.js ก่อนครับ');
+      return;
+    }
+
+    fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify({
+        fn: functionName,
+        args: Array.isArray(args) ? args : []
+      })
+    })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status);
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        onSuccess(data);
+      })
+      .catch(function (error) {
+        onFailure(error);
+      });
   }
 
   /* ==========================================================
@@ -2072,4 +2107,3 @@
     init();
   }
 })();
-</script>
