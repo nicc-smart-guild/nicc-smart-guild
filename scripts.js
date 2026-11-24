@@ -114,7 +114,7 @@
     }
     return id;
   }
-var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbytuBeIQQQ5DEucp7UiRlOQl2_-fEw-UL7vtY-1_rnxtFcnXw8W7qeChDPlpDqBQmU/exec';
+var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYCLZvxX8R-E0R2H0t2P7w7uG2Pjw1JTxFOxigtsAGWAP4Ho/exec';
 
   function hasBackend() {
     return !!GAS_API_URL;
