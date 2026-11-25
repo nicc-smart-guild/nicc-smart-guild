@@ -1070,7 +1070,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
   }
   function questLinked(o) {
     var names = [];
-    qArr(o.programs).forEach(function (id) { var p = programById(id); if (p && p.name) names.push(p.name); });
+    qArr(o.programs).forEach(function (id) { var p = programById(id); if (p && p.name) names.push(p.name + (p.level ? ' (' + p.level + ')' : '')); });
     qArr(o.departments).forEach(function (id) { var d = deptById(id); if (d && d.name) names.push(d.name); });
     names = uniq(names).slice(0, 2);
     return names.length ? 'แนวทาง: ' + names.join(' • ') : '';
