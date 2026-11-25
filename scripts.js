@@ -222,6 +222,121 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     head: { eyes: 'happy', mouth: 'smile' }
   };
 
+  /* ============================================================
+   * ท่าทางน้อง NICC ตามแผนก (ใช้กับ NICC Card Quest)
+   * pose: auto, ev, electric, machine, build, it, account, hotel, chef, market, fish, farm, robot
+   * pose ที่มี hat จะใช้หมวกอาชีพแทนหมวกรับปริญญา
+   * ============================================================ */
+  function mGear(cx, cy, r, fill, stroke) {
+    var n = 8, pts = [], i, a, w = Math.PI / n * 0.55;
+    function pt(ang, rad) { return (cx + Math.cos(ang) * rad).toFixed(1) + ',' + (cy + Math.sin(ang) * rad).toFixed(1); }
+    for (i = 0; i < n; i++) {
+      a = (i / n) * Math.PI * 2;
+      pts.push(pt(a - w, r * 0.8), pt(a - w * 0.7, r), pt(a + w * 0.7, r), pt(a + w, r * 0.8));
+    }
+    return '<polygon points="' + pts.join(' ') + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="2" stroke-linejoin="round"/>' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.34).toFixed(1) + '" fill="#FFFFFF" stroke="' + stroke + '" stroke-width="2"/>';
+  }
+  function mRaiseR() { return mArm('M154 172 Q194 164 188 132') + mHand(188, 124); }
+  function mTwoHands(xl, xr) {
+    return { L: mArm('M46 172 Q38 200 ' + xl + ' 207') + mHand(xl, 207), R: mArm('M154 172 Q162 200 ' + xr + ' 207') + mHand(xr, 207) };
+  }
+  function mHardHat(main, dark, light, emblem) {
+    return '<path d="M46 66 Q46 22 100 22 Q154 22 154 66Z" fill="' + main + '" stroke="' + dark + '" stroke-width="2.5" stroke-linejoin="round"/>' +
+      '<rect x="92" y="22" width="16" height="42" fill="' + light + '" stroke="' + dark + '" stroke-width="2"/>' +
+      '<rect x="36" y="62" width="128" height="10" rx="5" fill="' + main + '" stroke="' + dark + '" stroke-width="2.5"/>' + (emblem || '');
+  }
+  var mGoggles = '<g fill="#FFFFFF" fill-opacity=".14" stroke="#FFC629" stroke-width="4"><rect x="61" y="86" width="36" height="31" rx="13"/><rect x="103" y="86" width="36" height="31" rx="13"/></g>' +
+    '<path d="M97 101 H103" stroke="#FFC629" stroke-width="4" stroke-linecap="round"/>';
+  var mChefHat = (function () {
+    var shapes = '<circle cx="68" cy="42" r="17"/><circle cx="132" cy="42" r="17"/><circle cx="100" cy="30" r="22"/><rect x="54" y="44" width="92" height="22" rx="8"/>';
+    return '<g fill="#BFD3F5" stroke="#BFD3F5" stroke-width="5" stroke-linejoin="round">' + shapes + '</g><g fill="#FFFFFF">' + shapes + '</g>' +
+      '<path d="M62 58 H138" stroke="#FFC629" stroke-width="3.5" stroke-linecap="round"/>';
+  })();
+  var mHotelHat = '<path d="M58 64 L65 34 H135 L142 64Z" fill="#0B2E8A" stroke="#071F63" stroke-width="2.5" stroke-linejoin="round"/>' +
+    '<ellipse cx="100" cy="34" rx="35" ry="6" fill="#17358F" stroke="#071F63" stroke-width="2"/>' +
+    '<rect x="60" y="50" width="80" height="7" fill="#FFC629"/><circle cx="100" cy="34" r="5" fill="#FFC629" stroke="#E8A800" stroke-width="1.5"/>';
+  var mBucketHat = '<path d="M62 54 Q62 28 100 28 Q138 28 138 54Z" fill="#3EB7F7" stroke="#1688D9" stroke-width="2.5" stroke-linejoin="round"/>' +
+    '<path d="M38 66 Q100 78 162 66 Q154 54 138 52 H62 Q46 54 38 66Z" fill="#3EB7F7" stroke="#1688D9" stroke-width="2.5" stroke-linejoin="round"/>' +
+    '<path d="M63 49 Q100 56 137 49" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>';
+  var mStrawHat = '<ellipse cx="100" cy="63" rx="64" ry="12" fill="#F2D27A" stroke="#C99A2E" stroke-width="2.5"/>' +
+    '<path d="M66 62 Q66 28 100 28 Q134 28 134 62Z" fill="#F2D27A" stroke="#C99A2E" stroke-width="2.5" stroke-linejoin="round"/>' +
+    '<path d="M67 52 Q100 60 133 52" fill="none" stroke="#C62F43" stroke-width="5" stroke-linecap="round"/>' +
+    '<path d="M82 38 q-4 8 -3 14 M100 33 v18 M118 38 q4 8 3 14" fill="none" stroke="#C99A2E" stroke-width="1.6" opacity=".6"/>';
+
+  (function () {
+    var calc = '', r, c, keyCols = ['#9DB9EC', '#9DB9EC', '#FFC629'];
+    for (r = 0; r < 3; r++) for (c = 0; c < 3; c++) calc += '<circle cx="' + (86 + c * 14) + '" cy="' + (198 + r * 8.5) + '" r="3.2" fill="' + keyCols[c] + '"/>';
+    var th = mTwoHands(62, 138), tc = mTwoHands(74, 126), tb = mTwoHands(70, 130);
+
+    POSES.auto = { eyes: 'happy', mouth: 'smile', L: mArm('M46 172 Q30 192 38 208') + mHand(38, 208), R: mRaiseR(),
+      back: '<g transform="translate(188 88) rotate(20)"><rect x="-5" y="-6" width="10" height="46" rx="5" fill="#C9D6EE" stroke="#6F8CC9" stroke-width="2"/>' +
+        '<circle cx="0" cy="-14" r="14" fill="#C9D6EE" stroke="#6F8CC9" stroke-width="2"/><rect x="-6" y="-34" width="12" height="16" fill="#FFFFFF" stroke="#6F8CC9" stroke-width="2"/></g>' +
+        '<path d="M170 60 l4 -7 M182 52 v-8 M158 70 l-7 -3" stroke="#FFC629" stroke-width="3" stroke-linecap="round" fill="none"/>' };
+    POSES.ev = { eyes: 'happy', mouth: 'open', L: mArm('M46 172 Q30 192 38 208') + mHand(38, 208), R: mRaiseR(),
+      back: '<g transform="translate(188 86)"><rect x="-8" y="-20" width="5" height="13" rx="2" fill="#FFC629" stroke="#E8A800" stroke-width="1.5"/><rect x="3" y="-20" width="5" height="13" rx="2" fill="#FFC629" stroke="#E8A800" stroke-width="1.5"/>' +
+        '<rect x="-14" y="-8" width="28" height="30" rx="8" fill="#FFFFFF" stroke="#1655FF" stroke-width="2.5"/><polygon points="3,-2 -7,10 0,10 -4,19 8,6 1,6" fill="#16B890" stroke="#0C8A5E" stroke-width="1.2" stroke-linejoin="round"/>' +
+        '<path d="M0 22 q0 12 -2 20" fill="none" stroke="#0B2E8A" stroke-width="5" stroke-linecap="round"/></g>' +
+        '<path d="M164 70 q-10 -4 -14 -14 M212 70 q8 -4 10 -12" stroke="#16B890" stroke-width="3" fill="none" stroke-linecap="round"/>' },
+    POSES.electric = { eyes: 'happy', mouth: 'open', L: mArm('M46 172 Q30 192 38 208') + mHand(38, 208), R: mRaiseR(),
+      hat: mHardHat('#2A6BFF', '#0B2E8A', '#5C8CFF', '<polygon points="70,34 62,50 69,50 65,60 77,45 70,45 74,34" fill="#FFC629" stroke="#E8A800" stroke-width="1"/>'),
+      back: '<circle cx="188" cy="92" r="27" fill="#FFF4D1"/><polygon points="196,64 172,96 186,96 180,122 206,88 191,88 199,64" fill="#FFC629" stroke="#E8A800" stroke-width="2.5" stroke-linejoin="round"/>' };
+    POSES.machine = { eyes: 'happy', mouth: 'smile', L: mArm('M46 172 Q30 192 38 208') + mHand(38, 208), R: mRaiseR(),
+      hat: mHardHat('#FFFFFF', '#6F8CC9', '#D9E6FA') + mGoggles,
+      back: mGear(188, 100, 21, '#9DB9EC', '#0B2E8A') + mGear(166, 76, 11, '#FFC629', '#E8A800') };
+    POSES.build = { eyes: 'happy', mouth: 'smile', L: mArm('M46 172 Q30 192 38 208') + mHand(38, 208), R: mRaiseR(),
+      hat: mHardHat('#FFC629', '#E8A800', '#FFD65C'),
+      back: '<g transform="translate(188 100) rotate(-16)"><rect x="-24" y="-15" width="48" height="30" rx="4" fill="#E3F3FE" stroke="#1655FF" stroke-width="2.5"/>' +
+        '<path d="M-15 -6 H15 M-15 2 H5 M-15 9 H12" stroke="#3EB7F7" stroke-width="2" stroke-linecap="round"/><rect x="-27" y="-17" width="6" height="34" rx="3" fill="#BFD3F5" stroke="#1655FF" stroke-width="2"/></g>' };
+    POSES.it = { eyes: 'happy', mouth: 'smile', L: th.L, R: th.R,
+      back: '<rect x="64" y="175" width="72" height="31" rx="5" fill="#0B2E8A" stroke="#FFFFFF" stroke-width="2.5"/>' +
+        '<text x="100" y="196" text-anchor="middle" font-family="Noto Sans Thai, sans-serif" font-weight="900" font-size="15" fill="#2FD0FF">&lt;/&gt;</text>' +
+        '<path d="M54 208 H146 L140 217 H60Z" fill="#D9E6FA" stroke="#9DB9EC" stroke-width="2" stroke-linejoin="round"/>' };
+    POSES.account = { eyes: 'happy', mouth: 'smile', L: tc.L, R: tc.R,
+      back: '<rect x="74" y="171" width="52" height="48" rx="8" fill="#FFFFFF" stroke="#1655FF" stroke-width="2.5"/><rect x="80" y="177" width="40" height="13" rx="3" fill="#0B2E8A"/>' +
+        '<text x="116" y="187.5" text-anchor="end" font-family="Noto Sans Thai, sans-serif" font-weight="900" font-size="9" fill="#2FD0FF">1,250</text>' + calc,
+      front: '<circle cx="180" cy="150" r="12" fill="#FFC629" stroke="#E8A800" stroke-width="2.5"/><text x="180" y="155" text-anchor="middle" font-family="Noto Sans Thai, sans-serif" font-weight="900" font-size="14" fill="#0B2E8A">฿</text>' };
+    POSES.hotel = { eyes: 'happy', mouth: 'smile', L: tb.L, R: tb.R, hat: mHotelHat,
+      back: '<rect x="66" y="209" width="68" height="8" rx="4" fill="#E8A800"/><path d="M74 210 a26 25 0 0 1 52 0z" fill="#FFC629" stroke="#E8A800" stroke-width="2.5" stroke-linejoin="round"/>' +
+        '<rect x="96" y="181" width="8" height="6" rx="2" fill="#E8A800"/><path d="M82 202 a20 18 0 0 1 11 -13" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".75"/>',
+      front: '<path d="M164 160 l6 -8 M176 150 l1 -10 M186 162 l9 -4" stroke="#FFC629" stroke-width="3" stroke-linecap="round" fill="none"/>' };
+    POSES.chef = { eyes: 'happy', mouth: 'open', L: mArm('M46 172 Q24 184 34 196') + mHand(34, 196), R: mRaiseR(), hat: mChefHat,
+      back: '<rect x="4" y="204" width="7" height="6" rx="2" fill="#6F8CC9"/><rect x="59" y="204" width="7" height="6" rx="2" fill="#6F8CC9"/>' +
+        '<path d="M10 200 H60 V214 a6 6 0 0 1 -6 6 H16 a6 6 0 0 1 -6 -6z" fill="#9DB9EC" stroke="#0B2E8A" stroke-width="2"/><rect x="7" y="196" width="56" height="7" rx="3.5" fill="#D9E6FA" stroke="#6F8CC9" stroke-width="2"/>' +
+        '<path d="M24 190 q-5 -6 0 -11 t0 -11 M38 190 q-5 -6 0 -11 t0 -11 M52 190 q-5 -6 0 -11 t0 -11" fill="none" stroke="#9DB9EC" stroke-width="3" stroke-linecap="round" opacity=".85"/>' +
+        '<path d="M188 124 V74" stroke="#6F8CC9" stroke-width="8" stroke-linecap="round"/><path d="M188 124 V74" stroke="#D9E6FA" stroke-width="4.5" stroke-linecap="round"/>' +
+        '<circle cx="188" cy="64" r="13" fill="#D9E6FA" stroke="#6F8CC9" stroke-width="2.5"/><ellipse cx="188" cy="66" rx="8" ry="5" fill="#9DB9EC"/>' };
+    POSES.market = { eyes: 'happy', mouth: 'open', L: mArm('M46 172 Q30 192 38 208') + mHand(38, 208), R: mRaiseR(),
+      back: '<g transform="translate(176 96) rotate(-24)"><rect x="-13" y="-8" width="13" height="16" rx="3" fill="#FFC629" stroke="#E8A800" stroke-width="2"/>' +
+        '<polygon points="0,-9 28,-23 28,23 0,9" fill="#FF6B8A" stroke="#C62F43" stroke-width="2.5" stroke-linejoin="round"/><rect x="26" y="-25" width="6" height="50" rx="3" fill="#C62F43"/>' +
+        '<path d="M40 -12 q8 12 0 24" fill="none" stroke="#FFC629" stroke-width="3" stroke-linecap="round"/></g>' };
+    POSES.fish = { eyes: 'happy', mouth: 'open', L: mArm('M46 172 Q30 192 38 208') + mHand(38, 208), R: mRaiseR(), hat: mBucketHat,
+      back: '<g transform="translate(188 100) rotate(-80)"><polygon points="-14,0 -31,-11 -31,11" fill="#1688D9" stroke="#1655FF" stroke-width="2" stroke-linejoin="round"/>' +
+        '<ellipse cx="0" cy="0" rx="19" ry="11" fill="#3EB7F7" stroke="#1655FF" stroke-width="2.5"/><ellipse cx="2" cy="4" rx="12" ry="4" fill="#E3F3FE"/>' +
+        '<circle cx="10" cy="-3" r="3" fill="#0B2E8A"/><path d="M-2 -10 q4 -8 10 -6" fill="none" stroke="#1655FF" stroke-width="2.5" stroke-linecap="round"/></g>' +
+        '<circle cx="168" cy="62" r="3.5" fill="#2FD0FF"/><circle cx="204" cy="72" r="3" fill="#2FD0FF"/><circle cx="174" cy="48" r="2.5" fill="#3EB7F7"/>' };
+    POSES.farm = { eyes: 'happy', mouth: 'smile', L: mArm('M46 172 Q30 192 38 208') + mHand(38, 208), R: mRaiseR(), hat: mStrawHat,
+      back: '<path d="M188 108 V82" stroke="#0C8A5E" stroke-width="3.5" stroke-linecap="round"/>' +
+        '<ellipse cx="177" cy="84" rx="12" ry="6" transform="rotate(-28 177 84)" fill="#3BD3A6" stroke="#0C8A5E" stroke-width="2"/>' +
+        '<ellipse cx="199" cy="76" rx="12" ry="6" transform="rotate(28 199 76)" fill="#3BD3A6" stroke="#0C8A5E" stroke-width="2"/>' +
+        '<ellipse cx="188" cy="68" rx="5" ry="9" fill="#3BD3A6" stroke="#0C8A5E" stroke-width="2"/>' +
+        '<path d="M175 108 H201 L197 126 H179Z" fill="#C97B3D" stroke="#8A4F1F" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="188" cy="108" rx="13" ry="3.5" fill="#8A4F1F"/>' };
+    POSES.robot = { eyes: 'happy', mouth: 'smile', L: mArm('M46 172 Q30 192 38 208') + mHand(38, 208), R: mRaiseR(),
+      back: '<g transform="translate(188 92)"><path d="M0 -15 V-25" stroke="#6F8CC9" stroke-width="3" stroke-linecap="round"/><circle cx="0" cy="-28" r="4" fill="#FFC629" stroke="#E8A800" stroke-width="1.5"/>' +
+        '<rect x="-22" y="-6" width="5" height="12" rx="2" fill="#9DB9EC"/><rect x="17" y="-6" width="5" height="12" rx="2" fill="#9DB9EC"/>' +
+        '<rect x="-18" y="-15" width="36" height="30" rx="9" fill="#FFFFFF" stroke="#3EB7F7" stroke-width="2.5"/><rect x="-13" y="-10" width="26" height="15" rx="6" fill="#071F63"/>' +
+        '<circle cx="-5" cy="-2.5" r="3.2" fill="#2FD0FF"/><circle cx="5" cy="-2.5" r="3.2" fill="#2FD0FF"/><path d="M-5 9 H5" stroke="#9DB9EC" stroke-width="2.5" stroke-linecap="round"/>' +
+        '<rect x="-7" y="15" width="14" height="22" rx="4" fill="#BFD3F5" stroke="#6F8CC9" stroke-width="2"/></g>' };
+
+    POSE_LABEL.auto = 'น้อง NICC ถือประแจ แผนกช่างยนต์'; POSE_LABEL.ev = 'น้อง NICC ถือหัวชาร์จ ยานยนต์ไฟฟ้า';
+    POSE_LABEL.electric = 'น้อง NICC สวมหมวกนิรภัยถือสายฟ้า แผนกช่างไฟ'; POSE_LABEL.machine = 'น้อง NICC ถือเฟือง แผนกช่างกลโรงงาน';
+    POSE_LABEL.build = 'น้อง NICC สวมหมวกนิรภัยถือแบบก่อสร้าง'; POSE_LABEL.it = 'น้อง NICC ถือแล็ปท็อป แผนกเทคโนโลยีสารสนเทศ';
+    POSE_LABEL.account = 'น้อง NICC ถือเครื่องคิดเลข แผนกการบัญชี'; POSE_LABEL.hotel = 'น้อง NICC ใส่หมวกพนักงานโรงแรมข้างกระดิ่งบริการ';
+    POSE_LABEL.chef = 'น้อง NICC สวมหมวกเชฟถือทัพพีข้างหม้อ'; POSE_LABEL.market = 'น้อง NICC ถือโทรโข่ง แผนกการตลาด';
+    POSE_LABEL.fish = 'น้อง NICC ถือปลา แผนกเพาะเลี้ยงสัตว์น้ำ'; POSE_LABEL.farm = 'น้อง NICC สวมหมวกฟางถือต้นกล้า';
+    POSE_LABEL.robot = 'น้อง NICC ถือหุ่นยนต์ตัวเล็ก แผนกเมคคาทรอนิกส์';
+  })();
+
   function mascot(pose, size, opts) {
     opts = opts || {};
     var key = POSES[pose] ? pose : 'welcome';
@@ -249,16 +364,21 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     s += '<circle cx="162" cy="104" r="13" fill="url(#mgBlue)" stroke="#FFC629" stroke-width="3"/><circle cx="162" cy="104" r="5" fill="#3EB7F7"/>';
     s += '<path d="M36 117 Q34 141 62 143" fill="none" stroke="#0B2E8A" stroke-width="3" stroke-linecap="round"/><circle cx="64" cy="143" r="4.5" fill="#FFC629"/>';
     s += mEyes(P.eyes) + mMouth(P.mouth);
-    // graduation cap
-    s += '<polygon points="30,42 100,68 170,42 170,47 100,73 30,47" fill="#071F63"/>';
-    s += '<path d="M64 50 v16 c0 7 16 10 36 10 s36 -3 36 -10 V50 z" fill="#0B2E8A"/>';
-    s += '<polygon points="100,16 170,42 100,68 30,42" fill="url(#mgBlue)" stroke="#071F63" stroke-width="1.5" stroke-linejoin="round"/>';
-    s += '<circle cx="100" cy="42" r="8" fill="none" stroke="#FFC629" stroke-width="4" stroke-dasharray="3.1 3.1"/><circle cx="100" cy="42" r="6" fill="#FFC629"/><circle cx="100" cy="42" r="2.3" fill="#0B2E8A"/>';
-    s += '<path d="M100 42 L156 49 V68" fill="none" stroke="#FFC629" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M152 66 h8 l2.5 13 h-13z" fill="#FFC629"/>';
+    // หมวก: pose ที่กำหนด hat ใช้หมวกอาชีพ ไม่งั้นใช้หมวกรับปริญญา
+    if (P.hat && !isHead) {
+      s += P.hat;
+    } else {
+      s += '<polygon points="30,42 100,68 170,42 170,47 100,73 30,47" fill="#071F63"/>';
+      s += '<path d="M64 50 v16 c0 7 16 10 36 10 s36 -3 36 -10 V50 z" fill="#0B2E8A"/>';
+      s += '<polygon points="100,16 170,42 100,68 30,42" fill="url(#mgBlue)" stroke="#071F63" stroke-width="1.5" stroke-linejoin="round"/>';
+      s += '<circle cx="100" cy="42" r="8" fill="none" stroke="#FFC629" stroke-width="4" stroke-dasharray="3.1 3.1"/><circle cx="100" cy="42" r="6" fill="#FFC629"/><circle cx="100" cy="42" r="2.3" fill="#0B2E8A"/>';
+      s += '<path d="M100 42 L156 49 V68" fill="none" stroke="#FFC629" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M152 66 h8 l2.5 13 h-13z" fill="#FFC629"/>';
+    }
     if (!isHead) {
       s += P.L || '';
       s += P.R || '';
       s += P.front || '';
+      if (opts.confetti) s += mConfetti();
     }
     return s + '</svg>';
   }
@@ -936,10 +1056,12 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       '<div class="banner banner-info" role="note">' + icon('warning', 'sm') + '<span><b>โปรดทราบ:</b> นี่เป็นเครื่องมือช่วยสำรวจความสนใจเบื้องต้นเท่านั้น ไม่ใช่การประเมินความสามารถหรือการรับประกันอาชีพ ระบบจับคู่คำตอบกับหลักสูตรตามที่วิทยาลัยกำหนดไว้ในฐานข้อมูล (ไม่มีการสุ่ม)</span></div>' +
       '<div id="career-body" class="section"></div></div>';
   }
+  /* โหมดคำถามปกติ: ข้ามคำถามแบบ "ตัดทิ้ง" (ใช้ได้เฉพาะในโหมดจั่วการ์ด) */
+  function classicQs() { return (D().careerQuestions || []).filter(function (q) { return q.mode !== 'avoid'; }); }
   function renderCareerClassic() {
     var box = $('#career-body');
     if (!box) return;
-    var Q = D().careerQuestions, c = state.career;
+    var Q = classicQs(), c = state.career;
     if (!Q.length) {
       box.innerHTML = emptyState('ยังไม่มีแบบสำรวจความสนใจ', 'ผู้ดูแลระบบเพิ่มคำถามได้ในชีต CareerQuestions แล้วตั้งสถานะเป็น active ระหว่างนี้ลองดูหลักสูตรทั้งหมดหรือถามน้อง NICC ได้เลย', 'empty',
         '<div class="btn-row" style="justify-content:center;margin-top:8px">' + navBtn('programs', 'ดูหลักสูตร', 'btn-primary', 'programs') + navBtn('chat', 'ถามน้อง NICC', 'btn-ghost', 'chat') + '</div>');
@@ -962,7 +1084,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       (c.i === Q.length - 1 ? 'ดูผลลัพธ์' : 'ข้อถัดไป') + icon('forward', 'sm') + '</button></div></div>';
   }
   function computeCareer() {
-    var Q = D().careerQuestions, progs = D().programs, c = state.career, scores = {}, reasons = {}, answered = 0;
+    var Q = classicQs(), progs = D().programs, c = state.career, scores = {}, reasons = {}, answered = 0;
     c.answers.forEach(function (ai, qi) {
       if (ai === undefined || ai === null || !Q[qi] || !Q[qi].options[ai]) return;
       answered++;
@@ -1002,34 +1124,80 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
   }
 
   /* ============================================================
-   * NICC Card Quest — แนะแนวแบบเกมการ์ด (iPad Kiosk)
-   * ใช้ข้อมูลเดิม: D().careerQuestions / D().programs / D().departments
-   * ฟิลด์เสริมในแต่ละ option (ไม่จำเป็น): title, desc, image_url, theme
+   * NICC Card Quest v2 — แนะแนวแบบเกมการ์ดตามหลัก Holland (RIASEC)
+   * ------------------------------------------------------------
+   * หลักการให้คะแนน (ปรับค่าได้ที่ค่าคงที่ด้านล่าง)
+   *   1) จับคู่โดยตรง   : การ์ด → programs/departments × weight (ตามชีต CareerQuestions)
+   *   2) ความสอดคล้อง RIASEC: โปรไฟล์ความสนใจของผู้เล่น เทียบกับรหัส Holland 3 ตัวของแต่ละสาขา
+   *   3) คะแนนรวม = 55% (1) + 45% (2)  แสดงเป็น "ความสอดคล้อง %" (สูงสุด 98%)
+   *   4) ตัวกรองระดับ    : ผู้เล่นเลือก ปวช. (จบ ม.3) หรือ ปวส. (จบ ม.6/ปวช.) → แปลงสาขาให้ตรงระดับ
+   *   5) โหมดเลือก 2 ใบ  : ใบแรก ×1, ใบสอง ×0.6   โหมดตัดทิ้ง: ลบคะแนน ×0.6
+   * ฟิลด์ที่ใช้ได้ใน options_json (ไม่ใส่ก็ได้ ระบบมีค่าสำรอง):
+   *   [..options..]  หรือ  { "stage":"ชื่อด่าน", "mode":"pick|avoid", "pick":2, "options":[..] }
+   *   option: label, title, desc, image_url, theme, pose, programs[], departments[], weight, riasec{R,I,A,S,E,C: 0-3}
    * ============================================================ */
-  var QUEST_MAX_ROUNDS = 6;     // จำนวนรอบสูงสุดต่อเกม (1 คำถาม = 1 รอบ)
-  var QUEST_PICK_DELAY = 650;   // ms ที่ค้างให้เห็นการ์ดที่เลือกก่อนไปรอบถัดไป
-  var QUEST_THINK_MS = 1700;    // ms หน้าประมวลผล
-  var QUEST_SECONDARY = 3;      // จำนวนสาขารองที่แสดง
+  var QUEST_MAX_ROUNDS = 12;    // จำนวนรอบสูงสุดต่อเกม
+  var QUEST_PICK_DELAY = 700;   // ms ค้างให้เห็นการ์ดที่เลือกก่อนไปรอบถัดไป
+  var QUEST_THINK_MS = 2600;    // ms หน้าประมวลผล
+  var QUEST_ALTS = 3;           // จำนวนสาขารองที่แสดง
+  var QUEST_SECOND = 0.6;       // น้ำหนักการ์ดใบที่ 2 (โหมดเลือกหลายใบ)
+  var QUEST_AVOID = 0.6;        // น้ำหนักลบของการ์ดที่ตัดทิ้ง
+  var QUEST_W_DIRECT = 0.55, QUEST_W_FIT = 0.45;
 
   var QUEST_THEMES = [
-    { key: 'blue',   pose: 'learning',  ico: 'tools' },
-    { key: 'sky',    pose: 'assistant', ico: 'skills' },
-    { key: 'gold',   pose: 'career',    ico: 'opportunities' },
-    { key: 'mint',   pose: 'success',   ico: 'community' },
-    { key: 'rose',   pose: 'welcome',   ico: 'learning' },
-    { key: 'violet', pose: 'thinking',  ico: 'certificate' }
+    { key: 'blue',   pose: 'learning' },
+    { key: 'sky',    pose: 'assistant' },
+    { key: 'gold',   pose: 'career' },
+    { key: 'mint',   pose: 'success' },
+    { key: 'rose',   pose: 'welcome' },
+    { key: 'violet', pose: 'thinking' }
   ];
-  var QUEST_RULES = [
-    [/ไฟฟ้า|อิเล็ก|วงจร|พลังงาน/, 'gold'],
-    [/คอมพิวเตอร์|โปรแกรม|ดิจิทัล|ไอที|เทคโนโลยี|เครือข่าย/, 'sky'],
-    [/บัญชี|ตัวเลข|เอกสาร|การตลาด|ธุรกิจ|สำนักงาน|ขาย|การเงิน/, 'mint'],
-    [/ซ่อม|เครื่องยนต์|เครื่องจักร|ประกอบ|โรงงาน|อู่|ช่างกล|เชื่อม/, 'blue'],
-    [/ออกแบบ|ศิลป|ฝีมือ|สร้างสรรค์|ประดิษฐ์|แฟชั่น|อาหาร|ท่องเที่ยว|โรงแรม|ความงาม/, 'rose'],
-    [/วิทยาศาสตร์|ฟิสิกส์|คณิต|วิเคราะห์|ทดลอง|ค้นคว้า/, 'violet']
+  var QUEST_LETTERS = ['R', 'I', 'A', 'S', 'E', 'C'];
+  var QUEST_TYPES = {
+    R: { name: 'ลงมือปฏิบัติ', short: 'นักลงมือ', theme: 'blue', desc: 'ชอบลงมือทำ ใช้เครื่องมือ และเห็นผลงานเป็นชิ้นเป็นอัน' },
+    I: { name: 'ค้นคว้า วิเคราะห์', short: 'นักค้นหา', theme: 'violet', desc: 'ชอบสงสัย หาเหตุผล และแก้ปัญหาด้วยข้อมูลและระบบ' },
+    A: { name: 'สร้างสรรค์', short: 'นักสร้างสรรค์', theme: 'rose', desc: 'ชอบคิดต่าง ใส่ไอเดียและความสวยงามลงในงาน' },
+    S: { name: 'ดูแลผู้คน', short: 'นักดูแล', theme: 'mint', desc: 'ชอบช่วยเหลือ ดูแล และทำงานร่วมกับผู้คน' },
+    E: { name: 'นำและโน้มน้าว', short: 'นักขับเคลื่อน', theme: 'gold', desc: 'ชอบเป็นผู้นำ วางแผน และขับเคลื่อนให้งานสำเร็จ' },
+    C: { name: 'เป็นระบบ ละเอียด', short: 'นักจัดระบบ', theme: 'sky', desc: 'ชอบความเป็นระเบียบ ละเอียด และทำตามขั้นตอน' }
+  };
+  /* รหัส Holland (เรียงจากเด่นสุด) ของแต่ละสาขา — จับจากชื่อสาขา/แผนก; ใส่ชื่อคอลัมน์ holland ในชีต Programs เพื่อกำหนดเองได้ */
+  var QUEST_HOLLAND = [
+    [/บริการยานยนต์/, 'RES'], [/ยานยนต์ไฟฟ้า/, 'RIC'], [/ช่างยนต์|เครื่องกล|จักรกล/, 'RIC'],
+    [/กลโรงงาน|การผลิต/, 'RCI'], [/ไฟฟ้า|ช่างไฟ/, 'RIC'], [/ก่อสร้าง/, 'RCE'],
+    [/สารสนเทศ|คอมพิวเตอร์/, 'ICR'], [/เมคคาทรอนิกส์|หุ่นยนต์/, 'IRC'], [/บัญชี/, 'CEI'],
+    [/โรงแรม/, 'SEC'], [/อาหาร|โภชนาการ/, 'RAE'], [/การตลาด/, 'EAS'],
+    [/สัตว์น้ำ|ประมง/, 'RIE'], [/เกษตร/, 'RIE']
+  ];
+  var QUEST_POSE_RULES = [
+    [/ยานยนต์ไฟฟ้า|รถยนต์ไฟฟ้า|รถไฟฟ้า|EV/, 'ev'],
+    [/ช่างยนต์|ยานยนต์|เครื่องยนต์|จักรกลหนัก|เครื่องกล|ซ่อมรถ|รถ/, 'auto'],
+    [/ไฟฟ้า|ช่างไฟ|วงจร|ไฟดับ/, 'electric'],
+    [/กลโรงงาน|เทคนิคการผลิต|กลึง|เชื่อม|เครื่องมือกล|ช่างกล|เครื่องจักร/, 'machine'],
+    [/ก่อสร้าง|ช่างปูน|อาคาร|บ้าน/, 'build'],
+    [/สารสนเทศ|คอมพิวเตอร์|โปรแกรม|ไอที|เว็บ|ดิจิทัล/, 'it'],
+    [/บัญชี|การเงิน|ตัวเลข|เอกสาร/, 'account'],
+    [/โรงแรม|ต้อนรับ|ท่องเที่ยว|รีสอร์ท|แขก/, 'hotel'],
+    [/อาหาร|โภชนาการ|ทำอาหาร|ครัว|เชฟ|ขนม/, 'chef'],
+    [/การตลาด|ขาย|ร้านค้า|ธุรกิจ/, 'market'],
+    [/สัตว์น้ำ|ประมง|ปลา|กุ้ง/, 'fish'],
+    [/เกษตร|พืช|ฟาร์ม|ธรรมชาติ/, 'farm'],
+    [/เมคคาทรอนิกส์|หุ่นยนต์|อัตโนมัติ/, 'robot']
+  ];
+  var QUEST_CHEERS = [
+    'ใบนี้น่าสนใจมาก! น้องนิคจดไว้แล้ว', 'เลือกได้ใจจริงๆ ไปต่อกัน!', 'เริ่มเห็นตัวตนของคุณแล้วนะ', 'ว้าว ตรงกับที่น้องนิคเดาเลย!'
+  ];
+  var QUEST_CHEERS_AVOID = [
+    'โอเค ตัดใบนี้ออก! การรู้ว่าไม่ชอบก็สำคัญ', 'ตัดสินใจได้เด็ดขาดมาก', 'ข้อมูลนี้ช่วยให้ผลแม่นขึ้นเยอะเลย'
+  ];
+  var QUEST_TIPS = [
+    'ผลนี้มาจากความสนใจที่คุณเลือก ยังไม่ได้วัดความสามารถหรือผลการเรียน',
+    'ลองเข้าชมโรงฝึกงานหรือกิจกรรมเปิดบ้านของสาขาที่ได้ เพื่อดูของจริงก่อนตัดสินใจ',
+    'คุยกับครูแนะแนว ผู้ปกครอง หรือรุ่นพี่ที่เรียนสาขานั้น แล้วเทียบกับผลที่ได้'
   ];
 
-  function freshQuest(mode, step) {
-    return { mode: mode || 'quest', step: step || 'intro', round: 0, picks: [], lock: false, pickTimer: 0, thinkTimer: 0 };
+  function freshQuest(mode, step, level) {
+    return { mode: mode || 'quest', step: step || 'intro', level: level || '', round: 0, picks: [], lock: false, pickTimer: 0, thinkTimer: 0 };
   }
   function questState() { if (!state.quest) state.quest = freshQuest(); return state.quest; }
   function questClearTimers() {
@@ -1039,34 +1207,181 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     s.pickTimer = 0; s.thinkTimer = 0; s.lock = false;
   }
   function qArr(x) { return Array.isArray(x) ? x.map(String) : []; }
+  function qPicks(s, qi) { var a = s.picks[qi]; return Array.isArray(a) ? a : []; }
   function questDeck() {
     return (D().careerQuestions || []).filter(function (q) { return q && Array.isArray(q.options) && q.options.length; }).slice(0, QUEST_MAX_ROUNDS);
   }
+  function qAvoid(q) { return q.mode === 'avoid'; }
+  function qNeed(q) {
+    var n = Math.floor(Number(q.pick)) || 1;
+    return Math.max(1, Math.min(n, 3, Math.max(1, q.options.length - 1)));
+  }
+  function qFactor(q, order) { return qAvoid(q) ? -QUEST_AVOID : (order === 0 ? 1 : QUEST_SECOND); }
+  function qWeight(o) { return Number(o.weight) > 0 ? Number(o.weight) : 1; }
+  function qLvl(p) { var t = String((p && p.level) || ''); return /ปวช/.test(t) ? 'ปวช.' : (/ปวส/.test(t) ? 'ปวส.' : ''); }
+  function qLevels() {
+    var seen = {}, out = [];
+    (D().programs || []).forEach(function (p) { var l = qLvl(p); if (l && !seen[l]) { seen[l] = 1; out.push(l); } });
+    return out;
+  }
+  function qDeptName(p) { var d = deptById(p && p.department_id); return d ? d.name : ''; }
+
   function themeIndex(key) {
     for (var i = 0; i < QUEST_THEMES.length; i++) if (QUEST_THEMES[i].key === key) return i;
     return -1;
   }
-  function questOptTheme(o, idx) {
-    var k = themeIndex(String((o && o.theme) || '').toLowerCase());
-    if (k >= 0) return k;
-    var text = String((o && o.title) || '') + ' ' + String((o && o.label) || '');
-    for (var i = 0; i < QUEST_RULES.length; i++) if (QUEST_RULES[i][0].test(text)) return themeIndex(QUEST_RULES[i][1]);
-    return idx % QUEST_THEMES.length;
+  function qZero() { return { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 }; }
+  function qCode(p) {
+    if (!p) return '';
+    var c = String(p.holland || '').toUpperCase().replace(/[^RIASEC]/g, '');
+    if (c) return c.slice(0, 3);
+    var text = String(p.name || '') + ' ' + qDeptName(p);
+    for (var i = 0; i < QUEST_HOLLAND.length; i++) if (QUEST_HOLLAND[i][0].test(text)) return QUEST_HOLLAND[i][1];
+    return '';
   }
-  /* ให้การ์ดในรอบเดียวกันสีไม่ซ้ำกัน (เท่าที่เป็นไปได้) */
-  function questRoundThemes(q) {
-    var used = {}, L = QUEST_THEMES.length;
-    return q.options.map(function (o, i) {
-      var t = questOptTheme(o, i), n = 0;
-      while (used[t] && n < L) { t = (t + 1) % L; n++; }
-      used[t] = 1;
+  function qCodeVec(code) {
+    var v = qZero(), w = [3, 2, 1];
+    code.split('').forEach(function (ch, i) { if (v[ch] !== undefined) v[ch] = w[i]; });
+    return v;
+  }
+  function qCos(a, b) {
+    var d = 0, na = 0, nb = 0;
+    QUEST_LETTERS.forEach(function (L) { d += a[L] * b[L]; na += a[L] * a[L]; nb += b[L] * b[L]; });
+    return (na && nb) ? d / Math.sqrt(na * nb) : 0;
+  }
+  function qHits(o) {
+    var hit = {}, progs = D().programs || [];
+    qArr(o.programs).forEach(function (id) { var p = programById(id); if (p) hit[p.id] = 1; });
+    qArr(o.departments).forEach(function (did) { progs.forEach(function (p) { if (String(p.department_id) === did) hit[p.id] = 1; }); });
+    return Object.keys(hit);
+  }
+  /* แปลงสาขาที่การ์ดชี้ไป ให้เป็นสาขาในระดับที่ผู้เล่นเลือก (เช่น ช่างยนต์ ปวช. → เทคนิคเครื่องกล ปวส. ของแผนกเดียวกัน) */
+  function qTargets(o, level) {
+    var progs = D().programs || [], out = {};
+    qHits(o).forEach(function (id) {
+      var p = programById(id);
+      if (!p) return;
+      var lv = qLvl(p);
+      if (!level || !lv || lv === level) { out[p.id] = 1; return; }
+      var same = progs.filter(function (x) { return x.department_id === p.department_id && qLvl(x) === level; });
+      var named = same.filter(function (x) { return x.name === p.name; });
+      (named.length ? named : same).forEach(function (x) { out[x.id] = 1; });
+    });
+    return Object.keys(out);
+  }
+  /* เวกเตอร์ความสนใจของการ์ด: ใช้ riasec ในการ์ด ถ้าไม่มีให้เฉลี่ยจากรหัส Holland ของสาขาที่การ์ดชี้ไป */
+  function qOptVec(o) {
+    var v = qZero(), tags = o && o.riasec, any = false;
+    if (tags && typeof tags === 'object') {
+      QUEST_LETTERS.forEach(function (L) { var n = Number(tags[L]); if (n > 0) { v[L] = Math.min(n, 3); any = true; } });
+    }
+    if (any) return v;
+    var cnt = 0;
+    qHits(o).forEach(function (id) {
+      var c = qCode(programById(id));
+      if (!c) return;
+      var cv = qCodeVec(c);
+      QUEST_LETTERS.forEach(function (L) { v[L] += cv[L]; });
+      cnt++;
+    });
+    if (cnt) QUEST_LETTERS.forEach(function (L) { v[L] = v[L] / cnt; });
+    return v;
+  }
+  function questProfile() {
+    var deck = questDeck(), s = questState(), vec = qZero();
+    deck.forEach(function (q, qi) {
+      qPicks(s, qi).forEach(function (idx, order) {
+        var o = q.options[idx];
+        if (!o) return;
+        var f = qFactor(q, order), ov = qOptVec(o);
+        if (f < 0) f = f * 0.5;
+        QUEST_LETTERS.forEach(function (L) { vec[L] += f * ov[L]; });
+      });
+    });
+    QUEST_LETTERS.forEach(function (L) { if (vec[L] < 0) vec[L] = 0; });
+    var order = QUEST_LETTERS.slice().sort(function (a, b) { return vec[b] - vec[a] || QUEST_LETTERS.indexOf(a) - QUEST_LETTERS.indexOf(b); });
+    var sum = 0;
+    QUEST_LETTERS.forEach(function (L) { sum += vec[L]; });
+    return { vec: vec, order: order, max: vec[order[0]] || 0, sum: sum, top: order.filter(function (L) { return vec[L] > 0; }).slice(0, 3) };
+  }
+
+  /* ---------- คำนวณผล ---------- */
+  function questScore() {
+    var deck = questDeck(), s = questState(), level = s.level, progs = D().programs || [];
+    var direct = {}, rounds = {}, why = {}, dumped = {}, ideal = 0, answered = 0;
+    deck.forEach(function (q, qi) {
+      var picks = qPicks(s, qi);
+      if (picks.length) answered++;
+      if (!qAvoid(q)) {
+        var mw = 0, i;
+        q.options.forEach(function (o) { mw = Math.max(mw, qWeight(o)); });
+        for (i = 0; i < qNeed(q); i++) ideal += mw * qFactor(q, i);
+      }
+      picks.forEach(function (idx, order) {
+        var o = q.options[idx];
+        if (!o) return;
+        var f = qFactor(q, order), w = qWeight(o), label = o.title || o.label;
+        qTargets(o, level).forEach(function (id) {
+          direct[id] = (direct[id] || 0) + f * w;
+          if (f > 0) { rounds[id] = (rounds[id] || 0) + 1; (why[id] = why[id] || []).push(label); }
+          else { (dumped[id] = dumped[id] || []).push(label); }
+        });
+      });
+    });
+    var profile = questProfile(), ids = Object.keys(direct).filter(function (id) { return direct[id] > 0; });
+    if (!ids.length) {   // ข้อมูลการ์ดไม่ได้ผูกสาขา → ใช้ความสอดคล้อง RIASEC อย่างเดียว
+      ids = progs.filter(function (p) { var l = qLvl(p); return qCode(p) && (!level || !l || l === level); }).map(function (p) { return p.id; });
+    }
+    var ranked = ids.map(function (id) {
+      var p = programById(id), code = qCode(p);
+      var fit = (profile.sum && code) ? qCos(profile.vec, qCodeVec(code)) : 0;
+      var dir = ideal ? Math.max(0, Math.min(1, (direct[id] || 0) / (0.7 * ideal))) : 0;
+      var pct = Math.min(98, Math.round(100 * (QUEST_W_DIRECT * dir + QUEST_W_FIT * fit)));
+      return { p: p, pct: pct, direct: direct[id] || 0, fit: fit, code: code, rounds: rounds[id] || 0, why: uniq(why[id] || []), dumped: uniq(dumped[id] || []) };
+    }).filter(function (r) { return r.p; }).sort(function (a, b) {
+      return b.pct - a.pct || b.direct - a.direct || String(a.p.name).localeCompare(String(b.p.name));
+    });
+    return { ranked: ranked, profile: profile, answered: answered, total: deck.length, level: level };
+  }
+
+  /* ---------- ธีม / ท่าทางของการ์ด ---------- */
+  function questOptTheme(o, idx) {   // คืน [ดัชนีธีม, ล็อกสีหรือไม่]
+    var k = themeIndex(String((o && o.theme) || '').toLowerCase());
+    if (k >= 0) return [k, true];
+    var v = qOptVec(o), best = '', max = 0;
+    QUEST_LETTERS.forEach(function (L) { if (v[L] > max) { max = v[L]; best = L; } });
+    if (o && o.riasec && best) return [themeIndex(QUEST_TYPES[best].theme), true];
+    var text = String((o && o.title) || '') + ' ' + String((o && o.label) || '');
+    var i, rules = [[/ไฟฟ้า|อิเล็ก|วงจร/, 'gold'], [/คอมพิวเตอร์|โปรแกรม|ดิจิทัล|ไอที|เทคโนโลยี/, 'sky'], [/บัญชี|ตัวเลข|เอกสาร|ธุรกิจ|ขาย/, 'mint'], [/ซ่อม|เครื่องยนต์|เครื่องจักร|ช่างกล|เชื่อม/, 'blue'], [/ออกแบบ|ศิลป|สร้างสรรค์|อาหาร|โรงแรม/, 'rose'], [/วิทยาศาสตร์|วิเคราะห์|ทดลอง/, 'violet']];
+    for (i = 0; i < rules.length; i++) if (rules[i][0].test(text)) return [themeIndex(rules[i][1]), false];
+    return [idx % QUEST_THEMES.length, false];
+  }
+  function questRoundThemes(q) {   // การ์ดที่สีไม่ล็อก จะเลี่ยงสีซ้ำกันในรอบเดียวกัน
+    var used = {}, L = QUEST_THEMES.length, info = q.options.map(function (o, i) { return questOptTheme(o, i); });
+    info.forEach(function (x) { if (x[1]) used[x[0]] = 1; });
+    return info.map(function (x) {
+      var t = x[0], n = 0;
+      if (!x[1]) { while (used[t] && n < L) { t = (t + 1) % L; n++; } used[t] = 1; }
       return t;
     });
   }
-  function questDeptTheme(deptId) {
-    var list = D().departments || [];
-    for (var i = 0; i < list.length; i++) if (list[i].id === deptId) return i % QUEST_THEMES.length;
-    return 0;
+  function questPoseFor(text) {
+    for (var i = 0; i < QUEST_POSE_RULES.length; i++) if (QUEST_POSE_RULES[i][0].test(text)) return QUEST_POSE_RULES[i][1];
+    return '';
+  }
+  function questProgPose(p) { return questPoseFor(String((p && p.name) || '') + ' ' + qDeptName(p)); }
+  function questCardPose(o, t) {
+    if (o.pose && POSES[o.pose]) return o.pose;
+    var k = questPoseFor(String(o.title || '') + ' ' + String(o.label || ''));
+    if (k) return k;
+    var cnt = {}, best = '', n = 0, tot = 0;
+    qHits(o).forEach(function (id) {
+      var kk = questProgPose(programById(id));
+      if (!kk) return;
+      cnt[kk] = (cnt[kk] || 0) + 1; tot++;
+      if (cnt[kk] > n) { n = cnt[kk]; best = kk; }
+    });
+    return (best && n * 2 >= tot) ? best : QUEST_THEMES[t].pose;
   }
   function questLinked(o) {
     var names = [];
@@ -1075,31 +1390,14 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     names = uniq(names).slice(0, 2);
     return names.length ? 'แนวทาง: ' + names.join(' • ') : '';
   }
-
-  /* ---------- คำนวณคะแนน: programs + departments × weight (weight ไม่มี/ผิดรูป = 1) ---------- */
-  function questScore() {
-    var deck = questDeck(), s = questState(), progs = D().programs || [], scores = {}, rounds = {}, why = {}, answered = 0;
-    deck.forEach(function (q, qi) {
-      var ai = s.picks[qi], o = (ai === undefined || ai === null) ? null : q.options[ai];
-      if (!o) return;
-      answered++;
-      var hit = {}, w = Number(o.weight) > 0 ? Number(o.weight) : 1;
-      qArr(o.programs).forEach(function (id) { var p = programById(id); if (p) hit[p.id] = 1; });
-      qArr(o.departments).forEach(function (did) {
-        progs.forEach(function (p) { if (String(p.department_id) === did) hit[p.id] = 1; });
-      });
-      Object.keys(hit).forEach(function (id) {
-        scores[id] = (scores[id] || 0) + w;
-        rounds[id] = (rounds[id] || 0) + 1;
-        (why[id] = why[id] || []).push(o.title || o.label);
-      });
+  function questStages(deck) {
+    var names = [], idx = [];
+    deck.forEach(function (q) {
+      var nm = q.stage || '';
+      if (!names.length || names[names.length - 1] !== nm) names.push(nm);
+      idx.push(names.length - 1);
     });
-    var ranked = Object.keys(scores).map(function (id) {
-      return { p: programById(id), score: scores[id], rounds: rounds[id], why: why[id] };
-    }).filter(function (r) { return r.p; }).sort(function (a, b) {
-      return b.score - a.score || b.rounds - a.rounds || String(a.p.name).localeCompare(String(b.p.name));
-    });
-    return { ranked: ranked, answered: answered, total: deck.length };
+    return { names: names, idx: idx };
   }
 
   /* ---------- Render ---------- */
@@ -1108,49 +1406,102 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       ? '<button type="button" class="btn btn-accent btn-sm" data-action="quest-mode">' + icon('chat', 'sm') + 'สลับไปเล่นโหมดจั่วการ์ด</button>'
       : '') + '</div>';
   }
-  function questIntroHtml(n) {
+  function questBadgeHtml(q, rank) {
+    if (qAvoid(q)) return icon('close', 'md');
+    return qNeed(q) > 1 ? '<b class="qc-rank">' + (rank + 1) + '</b>' : icon('check', 'md');
+  }
+  function questMeterHtml() {
+    var pf = questProfile();
+    return QUEST_LETTERS.map(function (L) {
+      var T = QUEST_TYPES[L], pct = pf.max ? Math.round(pf.vec[L] / pf.max * 100) : 0;
+      return '<span class="qm t-' + T.theme + (pf.top[0] === L && pf.max ? ' is-top' : '') + '"><b>' + L + '</b><span class="qm-name">' + esc(T.short.replace('นัก', '')) + '</span><i style="--v:' + pct + '%"></i></span>';
+    }).join('');
+  }
+  function questIntroHtml(n, deck) {
+    var st = questStages(deck), levels = qLevels(), mins = Math.max(2, Math.round(n * 0.4)), btns;
+    if (levels.length > 1) {
+      btns = '<button type="button" class="btn btn-accent btn-lg" data-action="quest-start" data-level="ปวช.">' + icon('forward', 'sm') + 'เริ่มเลย: กำลังจบ ม.3 (ปวช.)</button>' +
+        '<button type="button" class="btn btn-accent btn-lg" data-action="quest-start" data-level="ปวส.">' + icon('forward', 'sm') + 'เริ่มเลย: จบ ม.6 / ปวช. (ปวส.)</button>';
+    } else {
+      btns = '<button type="button" class="btn btn-accent btn-lg" data-action="quest-start" data-level="' + esc(levels[0] || '') + '">' + icon('forward', 'sm') + 'เริ่มจั่วการ์ด</button>';
+    }
     return '<section class="quest quest-intro" aria-labelledby="qh">' +
       '<div class="qi-art"><div class="qi-deck" aria-hidden="true"><i class="t-sky"></i><i class="t-gold"></i><i class="t-blue"></i></div>' + mascot('career', 170, { float: true, deco: true }) + '</div>' +
       '<div class="qi-text"><span class="qbadge">NICC Card Quest</span>' +
       '<h2 id="qh" tabindex="-1">จั่วการ์ด ค้นหาสาขาที่ใช่</h2>' +
-      '<p>แตะเลือกการ์ดที่ “ใช่ตัวคุณ” ที่สุดทีละรอบ รวม ' + n + ' รอบ แล้วน้องนิคจะแนะนำสาขาที่เหมาะให้ทันที</p>' +
-      '<div class="btn-row">' +
-      '<button type="button" class="btn btn-accent btn-lg" data-action="quest-start">' + icon('forward', 'sm') + 'เริ่มจั่วการ์ด</button>' +
-      '<button type="button" class="btn btn-ghost" data-action="quest-classic">ตอบแบบคำถามปกติ</button></div></div></section>';
+      '<p>ผจญภัย ' + st.names.length + ' ด่าน รวม ' + n + ' รอบ ใช้เวลาประมาณ ' + mins + ' นาที น้องนิคจะวิเคราะห์ความสนใจของคุณตามหลัก Holland (RIASEC) แล้วจับคู่กับสาขาของวิทยาลัย</p>' +
+      '<ul class="qi-points"><li>เลือกการ์ดที่ใช่</li><li>ตัดการ์ดที่ไม่ใช่</li><li>ลองสถานการณ์จริง</li></ul>' +
+      '<div class="btn-row">' + btns + '<button type="button" class="btn btn-ghost" data-action="quest-classic">ตอบแบบคำถามปกติ</button></div></div></section>';
   }
-  function questCardHtml(o, i, t, picked) {
-    var T = QUEST_THEMES[t], title = o.title || o.label || ('การ์ดใบที่ ' + (i + 1));
+  function questCardHtml(q, o, i, t, rank) {
+    var T = QUEST_THEMES[t], picked = rank >= 0, title = o.title || o.label || ('การ์ดใบที่ ' + (i + 1));
     var desc = o.desc || o.description || ((o.title && o.label && o.title !== o.label) ? o.label : questLinked(o));
     var img = safeUrl(o.image_url || o.image);
-    return '<button type="button" class="qcard t-' + T.key + (picked ? ' is-picked' : '') + '" role="radio" aria-checked="' + (picked ? 'true' : 'false') + '" data-action="quest-pick" data-idx="' + i + '" style="--i:' + i + '">' +
+    return '<button type="button" class="qcard t-' + T.key + (picked ? ' is-picked' : '') + '" role="checkbox" aria-checked="' + (picked ? 'true' : 'false') + '" data-action="quest-pick" data-idx="' + i + '" style="--i:' + i + '">' +
       '<span class="qc-frame">' +
-      '<span class="qc-art">' + mascot(T.pose, 104, { deco: true }) +
+      '<span class="qc-art">' + mascot(questCardPose(o, t), 104, { deco: true }) +
       (img ? '<img src="' + esc(img) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '') +
       '<span class="qc-tag">NICC</span></span>' +
       '<span class="qc-body"><span class="qc-title">' + esc(title) + '</span>' + (desc ? '<span class="qc-desc">' + esc(desc) + '</span>' : '') + '</span>' +
-      '<span class="qc-check" aria-hidden="true">' + icon('check', 'md') + '</span></span></button>';
+      '<span class="qc-check" aria-hidden="true">' + (picked ? questBadgeHtml(q, rank) : '') + '</span></span></button>';
+  }
+  function questHintText(q) {
+    var n = qNeed(q);
+    if (qAvoid(q)) return 'ตัดทิ้ง ' + n + ' ใบที่ “ไม่ใช่” คุณที่สุด';
+    return n > 1 ? 'เลือก ' + n + ' ใบที่ใช่ที่สุด — ใบแรกคือใบโปรด' : 'แตะการ์ดที่ใช่ตัวคุณที่สุด 1 ใบ';
   }
   function questPickHtml(deck) {
-    var s = questState(), n = deck.length, q = deck[s.round], sel = s.picks[s.round], hasSel = sel !== undefined && sel !== null;
-    var pct = Math.round(((s.round + (hasSel ? 1 : 0)) / n) * 100), themes = questRoundThemes(q);
-    var pips = '';
-    for (var i = 0; i < n; i++) pips += '<i class="' + (i < s.round ? 'done' : (i === s.round ? 'now' : '')) + '"></i>';
+    var s = questState(), n = deck.length, q = deck[s.round], cur = qPicks(s, s.round), need = qNeed(q);
+    var pct = Math.round(((s.round + (cur.length >= need ? 1 : 0)) / n) * 100), themes = questRoundThemes(q), st = questStages(deck);
+    var stageNo = st.idx[s.round], stageName = st.names[stageNo], pips = '', i;
+    for (i = 0; i < n; i++) pips += '<i class="' + (i < s.round ? 'done' : (i === s.round ? 'now' : '')) + '"></i>';
+    var chip = (st.names.length > 1 || stageName)
+      ? '<span class="q-stage' + (qAvoid(q) ? ' is-avoid' : '') + '">ด่านที่ ' + (stageNo + 1) + '/' + st.names.length + (stageName ? ' • ' + esc(stageName) : '') + '</span>' : '';
     return '<section class="quest quest-pick" aria-labelledby="qh">' +
-      '<div class="q-top"><b class="q-round">รอบที่ ' + (s.round + 1) + ' จาก ' + n + '</b><span class="q-pips" aria-hidden="true">' + pips + '</span>' + sampleBadge(q) + '</div>' +
+      '<div class="q-top">' + chip + '<b class="q-round">รอบที่ ' + (s.round + 1) + ' จาก ' + n + '</b><span class="q-pips" aria-hidden="true">' + pips + '</span>' + sampleBadge(q) + '</div>' +
       '<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '"><i style="width:' + pct + '%"></i></div>' +
-      '<h2 id="qh" tabindex="-1">' + esc(q.question) + '</h2><p class="q-hint">แตะการ์ดที่ตรงกับคุณที่สุด 1 ใบ</p>' +
-      '<div class="qgrid' + (hasSel ? ' has-pick' : '') + '" id="qgrid" role="radiogroup" aria-labelledby="qh">' +
-      q.options.map(function (o, idx) { return questCardHtml(o, idx, themes[idx], hasSel && sel === idx); }).join('') + '</div>' +
+      '<div class="q-meter" id="qmeter" aria-label="โปรไฟล์ความสนใจของคุณ ณ ตอนนี้">' + questMeterHtml() + '</div>' +
+      '<h2 id="qh" tabindex="-1">' + esc(q.question) + '</h2>' +
+      '<div class="q-coach"><span class="qco-face">' + mascot('head', 44, { deco: true }) + '</span><p class="qco-say" id="qsay">' + esc(questHintText(q)) + '</p></div>' +
+      '<div class="qgrid' + (qAvoid(q) ? ' is-avoid' : '') + (cur.length ? ' has-pick' : '') + (cur.length >= need ? ' is-done' : '') + '" id="qgrid" role="group" aria-labelledby="qh">' +
+      q.options.map(function (o, idx) { return questCardHtml(q, o, idx, themes[idx], cur.indexOf(idx)); }).join('') + '</div>' +
       '<div class="q-foot">' +
       (s.round > 0 ? '<button type="button" class="btn btn-ghost" data-action="quest-prev">' + icon('back', 'sm') + 'ย้อนกลับ</button>' : '<span></span>') +
       '<button type="button" class="btn btn-quiet q-reset" data-action="quest-restart">เริ่มใหม่</button></div></section>';
   }
-  function questThinkHtml() {
+  function questThinkHtml(n) {
     return '<section class="quest quest-think" role="status" aria-live="polite">' + mascot('thinking', 150, { float: true, deco: true }) +
-      '<h2>น้องนิคกำลังจับคู่สาขาให้คุณ…</h2><p>กำลังรวมคะแนนจากการ์ดที่คุณเลือก</p><span class="qdots" aria-hidden="true"><i></i><i></i><i></i></span></section>';
+      '<h2>น้องนิคกำลังวิเคราะห์ให้คุณ…</h2>' +
+      '<ul class="qsteps"><li style="--d:0s">รวมคะแนนจากการ์ดทั้ง ' + n + ' รอบ</li><li style="--d:.8s">เทียบกับรหัสความสนใจ (RIASEC) ของแต่ละสาขา</li><li style="--d:1.6s">จัดอันดับและเตรียมการ์ดผลลัพธ์</li></ul>' +
+      '<span class="qdots" aria-hidden="true"><i></i><i></i><i></i></span></section>';
+  }
+  function questBandText(pct) { return pct >= 80 ? 'ตรงมาก' : pct >= 65 ? 'ตรง' : pct >= 50 ? 'พอไปได้' : 'ลองพิจารณา'; }
+  function questConfidence(r) {
+    var a = r.ranked[0], b = r.ranked[1];
+    if (!b) return { k: 'high', t: 'ผลชี้ไปที่สาขานี้ค่อนข้างชัดเจน' };
+    var gap = a.pct - b.pct;
+    if (gap >= 8) return { k: 'high', t: 'ผลชี้ไปที่สาขานี้ค่อนข้างชัดเจน (นำสาขารองอยู่ ' + gap + ' คะแนน)' };
+    if (gap >= 3) return { k: 'mid', t: 'สาขานี้นำอยู่เล็กน้อย ควรดู “' + b.p.name + '” ประกอบด้วย' };
+    return { k: 'low', t: 'สาขานี้กับ “' + b.p.name + '” คะแนนสูสีกันมาก แนะนำให้ลองเรียนรู้ทั้งสองสาขา (เข้าชมหรือลองทำจริง) ก่อนตัดสินใจ' };
+  }
+  function questPersonaHtml(r) {
+    var pf = r.profile, top = pf.top;
+    if (!top.length) return '';
+    var title = QUEST_TYPES[top[0]].short + (top[1] ? ' × ' + QUEST_TYPES[top[1]].short : '');
+    var clear = pf.sum && (pf.vec[top[0]] / pf.sum >= 0.3);
+    var bars = pf.order.map(function (L) {
+      var T = QUEST_TYPES[L], w = pf.max ? Math.round(pf.vec[L] / pf.max * 100) : 0;
+      return '<div class="qbar t-' + T.theme + '"><span class="qb-l"><b>' + L + '</b> ' + esc(T.name) + '</span><span class="qb-track"><i style="width:' + w + '%"></i></span><span class="qb-v">' + w + '</span></div>';
+    }).join('');
+    return '<article class="qpersona"><div class="qp-art">' + mascot('assistant', 120, { float: true, deco: true }) + '</div>' +
+      '<div class="qp-body"><span class="qbadge">ไทป์ความสนใจของคุณ</span><h3>' + esc(title) + '</h3>' +
+      '<div class="qp-code" aria-label="รหัสความสนใจ">' + top.join(' · ') + '</div>' +
+      '<p>' + esc(QUEST_TYPES[top[0]].desc) + (top[1] ? ' และ' + esc(QUEST_TYPES[top[1]].desc.replace(/^ชอบ/, 'ชอบ')) : '') + '</p>' +
+      '<p class="qp-note">โปรไฟล์ของคุณ' + (clear ? 'ค่อนข้างชัดเจน' : 'หลากหลาย ผสมผสานหลายด้าน') + '</p>' +
+      '<div class="qbars" role="img" aria-label="คะแนนความสนใจ 6 ด้าน">' + bars + '</div></div></article>';
   }
   function questResultHtml() {
-    var r = questScore(), foot = '';
+    var r = questScore(), deck = questDeck();
     if (!r.ranked.length) {
       return '<section class="quest quest-result" aria-labelledby="qh"><div class="q-empty">' + mascot('empty', 120, { deco: true }) +
         '<h2 id="qh" tabindex="-1">ยังไม่พบสาขาที่ผูกกับการ์ดที่เลือก</h2><p>ข้อมูลการจับคู่อาจยังไม่ครบ ลองเล่นอีกครั้ง ดูหลักสูตรทั้งหมด หรือสอบถามน้องนิคได้เลย</p>' +
@@ -1158,35 +1509,45 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
         '<button type="button" class="btn btn-accent" data-action="quest-replay">' + icon('back', 'sm') + 'เล่นใหม่</button>' +
         navBtn('programs', 'ดูหลักสูตรทั้งหมด', 'btn-ghost', 'programs') + '</div></div></section>';
     }
-    var top = r.ranked[0], p = top.p, dept = deptById(p.department_id), T = QUEST_THEMES[questDeptTheme(p.department_id)];
-    var img = safeUrl(dept && dept.image_url);
-    var ask = 'อยากรู้เรื่องสาขา ' + p.name + ' เรียนอะไรบ้าง จบแล้วทำงานอะไรได้ และสมัครอย่างไร';
+    var top = r.ranked[0], p = top.p, dept = deptById(p.department_id), pose = questProgPose(p) || 'success';
+    var T = QUEST_THEMES[0], dIdx = (D().departments || []).indexOf(dept);
+    T = QUEST_THEMES[dIdx >= 0 ? dIdx % QUEST_THEMES.length : 0];
+    var img = safeUrl(dept && dept.image_url), conf = questConfidence(r);
+    var ask = 'อยากรู้เรื่องสาขา ' + p.name + (p.level ? ' (' + p.level + ')' : '') + ' เรียนอะไรบ้าง จบแล้วทำงานอะไรได้ และสมัครอย่างไร';
+    var userTop = r.profile.top, match = (top.code || '').split('').filter(function (L) { return userTop.indexOf(L) >= 0; });
+    var reasons = [];
+    if (match.length) reasons.push('รหัสความสนใจของสาขา (' + top.code.split('').join('·') + ') ตรงกับไทป์ของคุณด้าน ' + match.map(function (L) { return QUEST_TYPES[L].name; }).join(' และ '));
+    if (top.rounds) reasons.push('มีการ์ดที่คุณเลือกชี้มาสาขานี้ ' + top.rounds + ' ใบ เช่น “' + top.why.slice(0, 3).map(esc).join('” “') + '”');
+    var warn = top.dumped.length ? '<div class="q-warn">' + icon('warning', 'sm') + '<span><b>ข้อควรคิด:</b> คุณตัดการ์ด “' + top.dumped.slice(0, 2).map(esc).join('” “') + '” ซึ่งเกี่ยวข้องกับสาขานี้ ลองทบทวนก่อนตัดสินใจ</span></div>' : '';
     var hero = '<article class="qhero t-' + T.key + '"><div class="qh-frame">' +
-      '<div class="qh-art">' + mascot('success', 150, { deco: true }) + (img ? '<img src="' + esc(img) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '') + '<span class="qc-tag">อันดับ 1</span></div>' +
+      '<div class="qh-art">' + mascot(pose, 150, { deco: true, confetti: true }) + (img ? '<img src="' + esc(img) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '') + '<span class="qc-tag">อันดับ 1</span></div>' +
       '<div class="qh-body"><span class="qbadge qbadge-gold">สาขาที่แนะนำสำหรับคุณ</span>' +
       '<div class="meta-row">' + (dept ? '<span class="badge">' + esc(dept.name) + '</span>' : '') + (p.level ? '<span class="badge badge-muted">' + esc(p.level) + '</span>' : '') + sampleBadge(p) + '</div>' +
-      '<h2 id="qh" tabindex="-1">' + esc(p.name) + '</h2>' +
+      '<div class="qh-title"><h2 id="qh" tabindex="-1">' + esc(p.name) + '</h2>' +
+      '<div class="qring" style="--p:' + top.pct + '" role="img" aria-label="ความสอดคล้อง ' + top.pct + ' เปอร์เซ็นต์"><b>' + top.pct + '%</b><small>' + questBandText(top.pct) + '</small></div></div>' +
       (p.description ? '<p class="qh-desc">' + esc(p.description) + '</p>' : '') +
-      '<div class="reason"><b>ทำไมจึงแนะนำ:</b> ตรงกับ ' + top.rounds + ' จาก ' + r.answered + ' รอบ — คุณเลือก “' + top.why.map(esc).join('” และ “') + '”</div>' +
+      '<div class="reason"><b>ทำไมจึงแนะนำ:</b><ul>' + reasons.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul></div>' +
+      '<div class="q-conf is-' + conf.k + '">' + icon(conf.k === 'low' ? 'warning' : 'success', 'sm') + '<span>' + esc(conf.t) + '</span></div>' + warn +
       '<div class="btn-row">' +
       '<button type="button" class="btn btn-primary" data-action="program" data-id="' + esc(p.id) + '">' + icon('programs', 'sm') + 'ดูหลักสูตร</button>' +
       '<button type="button" class="btn btn-accent" data-action="ask-about" data-text="' + esc(ask) + '">' + icon('chat', 'sm') + 'ถามน้องนิคเรื่องสาขานี้</button>' +
       '<button type="button" class="btn btn-ghost" data-action="quest-replay">' + icon('back', 'sm') + 'เล่นใหม่</button></div></div></div></article>';
-    var rest = r.ranked.slice(1, 1 + QUEST_SECONDARY);
+    var rest = r.ranked.slice(1, 1 + QUEST_ALTS), alts = '';
     if (rest.length) {
-      foot = '<h3 class="q-sub">สาขารองที่น่าสนใจ</h3><div class="qminis">' + rest.map(function (x) {
-        var d = deptById(x.p.department_id), t = QUEST_THEMES[questDeptTheme(x.p.department_id)];
-        return '<article class="qmini t-' + t.key + '"><span class="qm-ico">' + icon(t.ico, 'md') + '</span><div class="qm-body">' +
-          (d ? '<span class="badge">' + esc(d.name) + '</span>' : '') + '<h4>' + esc(x.p.name) + '</h4>' +
-          '<small>ตรงกับ ' + x.rounds + ' จาก ' + r.answered + ' รอบ</small></div>' +
+      alts = '<h3 class="q-sub">สาขารองที่น่าสนใจ</h3><div class="qminis">' + rest.map(function (x) {
+        var d = deptById(x.p.department_id), di = (D().departments || []).indexOf(d), t = QUEST_THEMES[di >= 0 ? di % QUEST_THEMES.length : 0];
+        return '<article class="qmini t-' + t.key + '"><span class="qm-ico">' + mascot(questProgPose(x.p) || 'welcome', 64, { deco: true }) + '</span><div class="qm-body">' +
+          '<div class="meta-row">' + (d ? '<span class="badge">' + esc(d.name) + '</span>' : '') + (x.p.level ? '<span class="badge badge-muted">' + esc(x.p.level) + '</span>' : '') + '</div><h4>' + esc(x.p.name) + '</h4>' +
+          '<div class="qm-pct"><span class="qb-track"><i style="width:' + x.pct + '%"></i></span><b>' + x.pct + '%</b></div></div>' +
           '<button type="button" class="btn btn-ghost btn-sm" data-action="program" data-id="' + esc(x.p.id) + '">ดูหลักสูตร' + icon('forward', 'sm') + '</button></article>';
       }).join('') + '</div>';
     }
-    return '<section class="quest quest-result" aria-labelledby="qh">' + hero + foot +
-      '<p class="q-note">ผลนี้เป็นเพียงข้อเสนอแนะเบื้องต้นจากความสนใจที่คุณเลือก ไม่ใช่การประเมินความสามารถ</p></section>';
+    var tips = '<div class="q-tips"><h3>ก่อนตัดสินใจ</h3><ol>' + QUEST_TIPS.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol></div>';
+    return '<section class="quest quest-result" aria-labelledby="qh">' + questPersonaHtml(r) + hero + alts + tips +
+      '<p class="q-note">ตอบ ' + r.answered + ' จาก ' + r.total + ' รอบ' + (r.level ? ' • ระดับ ' + esc(r.level) : '') + ' • ผลเป็นข้อเสนอแนะเบื้องต้นจากความสนใจ ไม่ใช่การประเมินความสามารถ</p></section>';
   }
 
-  /* ---------- ตัวควบคุมหลัก (แทนที่ชื่อเดิม renderCareerBody; ของเดิมถูกเปลี่ยนชื่อเป็น renderCareerClassic) ---------- */
+  /* ---------- ตัวควบคุมหลัก (แทนชื่อเดิม renderCareerBody; ของเดิมคือ renderCareerClassic) ---------- */
   function renderCareerBody() {
     var box = $('#career-body');
     if (!box) return;
@@ -1200,9 +1561,9 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     if (s.step === 'processing' && !s.thinkTimer) questThink();
     if (s.step === 'result' && !s.picks.length) s.step = 'intro';
     box.innerHTML = s.step === 'pick' ? questPickHtml(deck)
-      : s.step === 'processing' ? questThinkHtml()
+      : s.step === 'processing' ? questThinkHtml(deck.length)
       : s.step === 'result' ? questResultHtml()
-      : questIntroHtml(deck.length);
+      : questIntroHtml(deck.length, deck);
   }
   function questFocus(scrollTop) {
     var h = $('#qh'), box = $('#career-body');
@@ -1226,33 +1587,51 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       if (s.step === 'processing') { s.step = 'result'; questShow(true); }
     }, QUEST_THINK_MS);
   }
-  function questStart() {
+  function questStart(level) {
     questClearTimers();
-    state.quest = freshQuest('quest', 'pick');
+    state.quest = freshQuest('quest', 'pick', level);
     questShow(true);
+  }
+  /* อัปเดตการ์ด/มิเตอร์/คำพูดน้องนิคทันทีที่แตะ โดยไม่วาดหน้าใหม่ (ลื่นบน iPad) */
+  function questPaint(q, cur, cheer) {
+    var grid = $('#qgrid'), need = qNeed(q);
+    if (grid) {
+      grid.classList.toggle('has-pick', cur.length > 0);
+      grid.classList.toggle('is-done', cur.length >= need);
+      $$('.qcard', grid).forEach(function (c, i) {
+        var rank = cur.indexOf(i), on = rank >= 0, chk = c.querySelector('.qc-check');
+        c.classList.toggle('is-picked', on);
+        c.setAttribute('aria-checked', on ? 'true' : 'false');
+        if (chk) chk.innerHTML = on ? questBadgeHtml(q, rank) : '';
+      });
+    }
+    var m = $('#qmeter'); if (m) m.innerHTML = questMeterHtml();
+    var say = $('#qsay');
+    if (say) say.textContent = cheer ? cheer : (cur.length ? 'เลือกแล้ว ' + cur.length + ' จาก ' + need + ' ใบ' : questHintText(q));
   }
   function questPick(idx) {
     var s = questState(), q = questDeck()[s.round];
     if (s.step !== 'pick' || s.lock || !q || !q.options[idx]) return;
-    s.picks[s.round] = idx;
-    s.picks.length = s.round + 1;
-    s.lock = true;
-    var grid = $('#qgrid');
-    if (grid) {
-      grid.classList.add('has-pick');
-      $$('.qcard', grid).forEach(function (c, i) {
-        var on = i === idx;
-        c.classList.toggle('is-picked', on);
-        c.setAttribute('aria-checked', on ? 'true' : 'false');
-      });
+    var need = qNeed(q), cur = s.picks[s.round] = qPicks(s, s.round), pos = cur.indexOf(idx), cheer = '';
+    if (pos >= 0) { cur.splice(pos, 1); }
+    else {
+      if (cur.length >= need) cur.shift();
+      cur.push(idx);
+      var pool = qAvoid(q) ? QUEST_CHEERS_AVOID : QUEST_CHEERS;
+      cheer = cur.length >= need ? pool[(s.round + idx) % pool.length] : '';
     }
+    s.picks.length = s.round + 1;
+    questPaint(q, cur, cheer);
     clearTimeout(s.pickTimer);
-    s.pickTimer = setTimeout(function () {
-      if (state.quest !== s) return;
-      s.pickTimer = 0; s.lock = false;
-      if (s.round + 1 >= questDeck().length) { s.step = 'processing'; questThink(); } else { s.round++; }
-      questShow(true);
-    }, QUEST_PICK_DELAY);
+    if (cur.length >= need) {
+      s.lock = true;
+      s.pickTimer = setTimeout(function () {
+        if (state.quest !== s) return;
+        s.pickTimer = 0; s.lock = false;
+        if (s.round + 1 >= questDeck().length) { s.step = 'processing'; questThink(); } else { s.round++; }
+        questShow(true);
+      }, QUEST_PICK_DELAY);
+    }
   }
   function questPrev() {
     var s = questState();
@@ -1263,8 +1642,9 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     questShow(false);
   }
   function questRestart(step) {
+    var lv = (step === 'pick' && state.quest) ? state.quest.level : '';
     questClearTimers();
-    state.quest = freshQuest('quest', step || 'intro');
+    state.quest = freshQuest('quest', step || 'intro', lv);
     questShow(true);
   }
 
@@ -1817,7 +2197,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
         if (chosen) chosen.focus();
         break;
       case 'career-next':
-        if (state.career.i >= D().careerQuestions.length - 1) state.career.done = true; else state.career.i++;
+        if (state.career.i >= classicQs().length - 1) state.career.done = true; else state.career.i++;
         renderCareerBody();
         break;
       case 'career-prev':
@@ -1829,7 +2209,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
         renderCareerBody();
         break;
       /* ---- NICC Card Quest ---- */
-      case 'quest-start': questStart(); break;
+      case 'quest-start': questStart(el.getAttribute('data-level') || ''); break;
       case 'quest-pick': questPick(Number(el.getAttribute('data-idx'))); break;
       case 'quest-prev': questPrev(); break;
       case 'quest-restart': questRestart('intro'); break;
