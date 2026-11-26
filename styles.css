@@ -739,6 +739,32 @@ details.acc .acc-body { padding: 0 var(--sp-4) var(--sp-4); color: var(--text-2)
   .qring { width: 80px; height: 80px; }
 }
 
+/* ============================================================
+   สมัครเรียน: ภาพประกาศรอบรับสมัคร + ตัวอย่างเอกสาร
+   ============================================================ */
+.poster { position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: 1 / 1; padding: 0; border: 0; cursor: zoom-in; color: var(--royal); overflow: hidden; touch-action: manipulation;
+  background: linear-gradient(135deg, var(--royal-100), var(--sky-100)); border-radius: var(--r-md) var(--r-md) 0 0; }
+.poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.poster img.img-broken { visibility: hidden; }
+.poster-hint { position: absolute; right: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 800; color: #fff; background: rgba(7, 31, 99, .78); }
+.poster:focus-visible { box-shadow: var(--focus); }
+
+.doc-row { align-items: center !important; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.doc-row:last-child { border-bottom: 0; }
+.doc-main { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.doc-desc { color: var(--text-2); font-size: var(--fs-xs); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.doc-thumb { flex: none; width: 52px; height: 52px; padding: 0; border: 2px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--royal-100); cursor: zoom-in; touch-action: manipulation; }
+.doc-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.doc-thumb img.img-broken { visibility: hidden; }
+.doc-btn { flex: none; white-space: nowrap; }
+.list-plain .doc-row .ico { margin-top: 0; }
+
+.zoom-box { max-height: 48vh; overflow: auto; border: 2px solid var(--line); border-radius: var(--r-md); background: #fff; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y pinch-zoom; }
+.zoom-img { display: block; width: 100%; height: auto; transition: width .25s var(--ease); }
+.zoom-box.is-zoom .zoom-img { width: 220%; max-width: none; }
+.zoom-bar { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; margin-top: var(--sp-2); }
+.doc-frame { display: block; width: 100%; height: 60vh; min-height: 340px; border: 2px solid var(--line); border-radius: var(--r-md); background: #fff; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
