@@ -65,6 +65,13 @@
       return (x.protocol === 'http:' || x.protocol === 'https:') ? x.href : '';
     } catch (e) { return ''; }
   }
+  /* ลิงก์รูปจาก Google Drive (แบบแชร์) → ลิงก์ที่ใช้เป็นรูปในหน้าเว็บได้ */
+  function imgSrc(u) {
+    var s = safeUrl(u), m;
+    if (!s) return '';
+    m = /drive\.google\.com\/file\/d\/([\w-]+)/.exec(s) || /drive\.google\.com\/(?:open|uc)\?(?:[^#]*&)?id=([\w-]+)/.exec(s);
+    return m ? 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w1600' : s;
+  }
   function telHref(p) {
     var n = String(p || '').replace(/[^0-9+]/g, '');
     return n ? 'tel:' + n : '';
@@ -938,7 +945,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       ? '<dl class="kv">' + (r.start_date ? '<dt>เริ่มรับสมัคร</dt><dd>' + esc(fmtDate(r.start_date)) + '</dd>' : '') +
         (r.end_date ? '<dt>สิ้นสุด</dt><dd>' + esc(fmtDate(r.end_date)) + '</dd>' : '') + '</dl>'
       : '<p class="small muted">ยังไม่ประกาศวันรับสมัคร</p>';
-    var img = safeUrl(r.image_url);
+    var img = imgSrc(r.image_url);
     var poster = img
       ? '<button type="button" class="poster" data-action="img-view" data-id="' + esc(r.id) + '" aria-label="ดูภาพประกาศ ' + esc(r.title) + ' ขนาดใหญ่">' + icon('admission', 'xl') +
         '<img src="' + esc(img) + '" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="poster-hint">' + icon('search', 'sm') + 'แตะเพื่อขยาย</span></button>'
@@ -1731,7 +1738,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
   function openRoundImage(id) {
     var r = null;
     D().admissions.forEach(function (x) { if (String(x.id) === String(id)) r = x; });
-    var img = r && safeUrl(r.image_url);
+    var img = r && imgSrc(r.image_url);
     if (!img) return;
     var apply = safeUrl(r.application_url);
     openModal('<div class="meta-row">' + (r.level ? '<span class="badge">' + esc(r.level) + '</span>' : '') +
@@ -1749,7 +1756,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
   function openDoc(id) {
     var i = docById(id);
     if (!i) return;
-    var img = safeUrl(i.image_url), L = sampleLinks(i.sample_url), btns = '';
+    var img = imgSrc(i.image_url), L = sampleLinks(i.sample_url), btns = '';
     var ask = 'ขอคำแนะนำการเตรียมเอกสาร ' + i.item + (i.level ? ' (ระดับ ' + i.level + ')' : '') + ' สำหรับสมัครเรียน';
     if (L.open) btns += '<a class="btn btn-primary" href="' + esc(L.open) + '" target="_blank" rel="noopener noreferrer">เปิดไฟล์ตัวอย่าง' + icon('external', 'sm') + '</a>';
     if (L.download) btns += '<a class="btn btn-ghost" href="' + esc(L.download) + '" target="_blank" rel="noopener noreferrer">ดาวน์โหลด' + icon('upload', 'sm') + '</a>';
@@ -1780,7 +1787,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
         var items = d.admissionDocs.filter(function (x) { return (x.level || 'ทั่วไป') === lv; });
         return '<div class="card card-flat"><h3>ระดับ ' + esc(lv) + '</h3><ul class="list-plain">' +
           items.map(function (i) {
-            var im = safeUrl(i.image_url), has = docHasSample(i), view = (im || safeUrl(i.sample_url)) ? 'ดูตัวอย่าง' : 'ดูรายละเอียด';
+            var im = imgSrc(i.image_url), has = docHasSample(i), view = (im || safeUrl(i.sample_url)) ? 'ดูตัวอย่าง' : 'ดูรายละเอียด';
             return '<li class="doc-row">' + (im
               ? '<button type="button" class="doc-thumb" data-action="doc-sample" data-id="' + esc(i.id) + '" aria-label="ดูตัวอย่าง ' + esc(i.item) + '"><img src="' + esc(im) + '" alt="" loading="lazy" referrerpolicy="no-referrer"></button>'
               : icon('success', 'sm')) +
@@ -2377,4 +2384,3 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
-
