@@ -938,7 +938,12 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       ? '<dl class="kv">' + (r.start_date ? '<dt>เริ่มรับสมัคร</dt><dd>' + esc(fmtDate(r.start_date)) + '</dd>' : '') +
         (r.end_date ? '<dt>สิ้นสุด</dt><dd>' + esc(fmtDate(r.end_date)) + '</dd>' : '') + '</dl>'
       : '<p class="small muted">ยังไม่ประกาศวันรับสมัคร</p>';
-    return '<article class="card"><div class="card-body"><div class="meta-row">' +
+    var img = safeUrl(r.image_url);
+    var poster = img
+      ? '<button type="button" class="poster" data-action="img-view" data-id="' + esc(r.id) + '" aria-label="ดูภาพประกาศ ' + esc(r.title) + ' ขนาดใหญ่">' + icon('admission', 'xl') +
+        '<img src="' + esc(img) + '" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="poster-hint">' + icon('search', 'sm') + 'แตะเพื่อขยาย</span></button>'
+      : '';
+    return '<article class="card">' + poster + '<div class="card-body"><div class="meta-row">' +
       (r.level ? '<span class="badge">' + esc(r.level) + '</span>' : '') +
       (r.academic_year ? '<span class="badge badge-muted">ปีการศึกษา ' + esc(r.academic_year) + '</span>' : '') +
       admissionStatus(r) + sampleBadge(r) + '</div>' +
@@ -1698,6 +1703,67 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     kioskArm();
   }
 
+  /* ---------- สมัครเรียน: ภาพประกาศ + ตัวอย่างเอกสาร ---------- */
+  /* ลิงก์ Google Drive / Docs → ลิงก์ฝังดูในหน้าเว็บ (preview) และลิงก์ดาวน์โหลด */
+  function driveInfo(url) {
+    var u = safeUrl(url), m;
+    if (!u) return null;
+    m = /drive\.google\.com\/file\/d\/([\w-]+)/.exec(u) || /drive\.google\.com\/(?:open|uc)\?(?:[^#]*&)?id=([\w-]+)/.exec(u);
+    if (m) return { embed: 'https://drive.google.com/file/d/' + m[1] + '/preview', download: 'https://drive.google.com/uc?export=download&id=' + m[1] };
+    m = /docs\.google\.com\/(document|presentation|spreadsheets)\/d\/([\w-]+)/.exec(u);
+    if (m) {
+      var base = 'https://docs.google.com/' + m[1] + '/d/' + m[2];
+      return { embed: base + (m[1] === 'presentation' ? '/embed' : '/preview'), download: base + '/export?format=pdf' };
+    }
+    return null;
+  }
+  function sampleLinks(url) {
+    var u = safeUrl(url), d = driveInfo(u);
+    if (!u) return { open: '', embed: '', download: '' };
+    if (d) return { open: u, embed: d.embed, download: d.download };
+    var pdf = /\.pdf(?:[?#]|$)/i.test(u);
+    return { open: u, embed: pdf ? u : '', download: /\.(pdf|docx?|xlsx?|pptx?)(?:[?#]|$)/i.test(u) ? u : '' };
+  }
+  function zoomViewerHtml(url, title) {
+    return '<div class="zoom-box" id="zoom-box"><img class="zoom-img" src="' + esc(url) + '" alt="' + esc(title || '') + '" referrerpolicy="no-referrer"></div>' +
+      '<div class="zoom-bar"><button type="button" class="btn btn-ghost btn-sm" data-action="img-zoom" aria-pressed="false">' + icon('search', 'sm') + 'ขยาย / ย่อภาพ</button><span class="small muted">แตะปุ่มเพื่อขยาย แล้วเลื่อนดูรายละเอียด</span></div>';
+  }
+  function openRoundImage(id) {
+    var r = null;
+    D().admissions.forEach(function (x) { if (String(x.id) === String(id)) r = x; });
+    var img = r && safeUrl(r.image_url);
+    if (!img) return;
+    var apply = safeUrl(r.application_url);
+    openModal('<div class="meta-row">' + (r.level ? '<span class="badge">' + esc(r.level) + '</span>' : '') +
+      (r.academic_year ? '<span class="badge badge-muted">ปีการศึกษา ' + esc(r.academic_year) + '</span>' : '') + sampleBadge(r) + '</div>' +
+      '<h2 id="modal-title" style="margin-top:8px">' + esc(r.title) + '</h2>' + zoomViewerHtml(img, r.title) +
+      '<div class="btn-row" style="margin-top:16px">' + (apply ? '<a class="btn btn-primary" href="' + esc(apply) + '" target="_blank" rel="noopener noreferrer">สมัครเรียนรอบนี้' + icon('external', 'sm') + '</a>' : '') +
+      '<a class="btn btn-ghost" href="' + esc(img) + '" target="_blank" rel="noopener noreferrer">เปิดภาพเต็ม' + icon('external', 'sm') + '</a></div>');
+  }
+  function docById(id) {
+    var out = null;
+    D().admissionDocs.forEach(function (x) { if (String(x.id) === String(id)) out = x; });
+    return out;
+  }
+  function docHasSample(i) { return !!(safeUrl(i.image_url) || safeUrl(i.sample_url) || String(i.description || '').trim()); }
+  function openDoc(id) {
+    var i = docById(id);
+    if (!i) return;
+    var img = safeUrl(i.image_url), L = sampleLinks(i.sample_url), btns = '';
+    var ask = 'ขอคำแนะนำการเตรียมเอกสาร ' + i.item + (i.level ? ' (ระดับ ' + i.level + ')' : '') + ' สำหรับสมัครเรียน';
+    if (L.open) btns += '<a class="btn btn-primary" href="' + esc(L.open) + '" target="_blank" rel="noopener noreferrer">เปิดไฟล์ตัวอย่าง' + icon('external', 'sm') + '</a>';
+    if (L.download) btns += '<a class="btn btn-ghost" href="' + esc(L.download) + '" target="_blank" rel="noopener noreferrer">ดาวน์โหลด' + icon('upload', 'sm') + '</a>';
+    btns += '<button type="button" class="btn btn-accent" data-action="ask-about" data-text="' + esc(ask) + '">' + icon('chat', 'sm') + 'ถามน้อง NICC</button>';
+    openModal('<div class="meta-row"><span class="badge">' + esc(i.level || 'ทั่วไป') + '</span><span class="badge badge-muted">เอกสารสมัครเรียน</span>' + sampleBadge(i) + '</div>' +
+      '<h2 id="modal-title" style="margin-top:8px">' + esc(i.item) + '</h2>' +
+      (i.description ? rich(i.description) : '') +
+      (img ? '<h3>ภาพตัวอย่างเอกสาร</h3>' + zoomViewerHtml(img, 'ตัวอย่าง ' + i.item) : '') +
+      (L.embed ? '<h3>ไฟล์ตัวอย่าง</h3><iframe class="doc-frame" src="' + esc(L.embed) + '" title="ตัวอย่าง ' + esc(i.item) + '" loading="lazy" referrerpolicy="no-referrer" allow="fullscreen"></iframe>' +
+        '<p class="small muted">หากไฟล์ไม่แสดง ให้กด “เปิดไฟล์ตัวอย่าง”</p>' : '') +
+      (!img && !L.open && !i.description ? '<p class="muted">ยังไม่มีตัวอย่างสำหรับเอกสารนี้ โปรดสอบถามเจ้าหน้าที่</p>' : '') +
+      '<div class="btn-row" style="margin-top:16px">' + btns + '</div>');
+  }
+
   /* ---------- Admission ---------- */
   function renderAdmission() {
     var d = D(), s = d.settings || {};
@@ -1713,7 +1779,14 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       (levels.length ? '<div class="grid grid-2">' + levels.map(function (lv) {
         var items = d.admissionDocs.filter(function (x) { return (x.level || 'ทั่วไป') === lv; });
         return '<div class="card card-flat"><h3>ระดับ ' + esc(lv) + '</h3><ul class="list-plain">' +
-          items.map(function (i) { return '<li>' + icon('success', 'sm') + '<span>' + esc(i.item) + ' ' + sampleBadge(i) + '</span></li>'; }).join('') + '</ul></div>';
+          items.map(function (i) {
+            var im = safeUrl(i.image_url), has = docHasSample(i), view = (im || safeUrl(i.sample_url)) ? 'ดูตัวอย่าง' : 'ดูรายละเอียด';
+            return '<li class="doc-row">' + (im
+              ? '<button type="button" class="doc-thumb" data-action="doc-sample" data-id="' + esc(i.id) + '" aria-label="ดูตัวอย่าง ' + esc(i.item) + '"><img src="' + esc(im) + '" alt="" loading="lazy" referrerpolicy="no-referrer"></button>'
+              : icon('success', 'sm')) +
+              '<span class="doc-main"><span>' + esc(i.item) + ' ' + sampleBadge(i) + '</span>' + (i.description ? '<small class="doc-desc">' + esc(String(i.description).split(/\r?\n/)[0]) + '</small>' : '') + '</span>' +
+              (has ? '<button type="button" class="btn btn-ghost btn-sm doc-btn" data-action="doc-sample" data-id="' + esc(i.id) + '">' + icon('search', 'sm') + view + '</button>' : '') + '</li>';
+          }).join('') + '</ul></div>';
       }).join('') + '</div>' : emptyState('ยังไม่มีรายการเอกสาร', 'วิทยาลัยยังไม่ได้เผยแพร่รายการเอกสารสำหรับการสมัคร', 'empty')) + '</section>';
     html += '<section class="section" aria-labelledby="stat-t"><div class="card card-flat"><h2 id="stat-t">ตรวจสอบสถานะการสมัคร</h2>' +
       (statusUrl ? '<p class="muted">สำหรับผู้ที่สมัครแล้ว สามารถตรวจสอบสถานะได้ที่ลิงก์ของวิทยาลัย</p><a class="btn btn-primary" href="' + esc(statusUrl) + '" target="_blank" rel="noopener noreferrer">ตรวจสอบสถานะ' + icon('external', 'sm') + '</a>'
@@ -2148,6 +2221,12 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     // ปุ่มที่มีทั้ง data-action อยู่ภายในการ์ดที่มี data-action: ใช้ตัวในสุดเสมอ (closest)
     switch (action) {
       case 'program': openProgram(el.getAttribute('data-id')); break;
+      case 'img-view': openRoundImage(el.getAttribute('data-id')); break;
+      case 'doc-sample': openDoc(el.getAttribute('data-id')); break;
+      case 'img-zoom':
+        var zb = $('#zoom-box');
+        if (zb) { var zoomed = zb.classList.toggle('is-zoom'); el.setAttribute('aria-pressed', zoomed ? 'true' : 'false'); }
+        break;
       case 'news': openNews(el.getAttribute('data-id')); break;
       case 'open-link':
         if (e.target.closest && e.target.closest('a[href]')) break;   // กดที่ลิงก์โดยตรง ให้เบราว์เซอร์เปิดเอง ไม่เปิดซ้ำ
