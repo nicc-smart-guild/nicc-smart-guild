@@ -1,3 +1,8 @@
+// 1. ตั้งค่า URL ของ ESP32 (ต้องมี http:// นำหน้า และใช้ IP ที่ได้จาก Serial Monitor จริง)
+var ROBOT_LED_IP = 'http://172.20.10.2';
+
+// รายการ mode ที่รองรับให้ตรงกับฝั่ง ESP32
+var VALID_EMOTIONS = ['happy', 'sad', 'angry', 'surprised', 'love', 'neutral', 'sleep'];
 (function () {
   'use strict';
 
@@ -124,7 +129,7 @@
 var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYCLZvxX8R-E0R2H0t2P7w7uG2Pjw1JTxFOxigtsAGWAP4Ho/exec';
 
   // ตั้งค่า IP Address ของ ESP32 (ดูจาก Serial Monitor ตอนเปิดเครื่อง)
-  var ROBOT_LED_IP = 'http://172.20.10.3'; 
+  var ROBOT_LED_IP = 'http://172.20.10.2'; 
 
   function sendRobotEmotion(mode) {
     if (!ROBOT_LED_IP) return;
