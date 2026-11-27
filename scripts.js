@@ -123,6 +123,19 @@
   }
 var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYCLZvxX8R-E0R2H0t2P7w7uG2Pjw1JTxFOxigtsAGWAP4Ho/exec';
 
+  // ตั้งค่า IP Address ของ ESP32 (ดูจาก Serial Monitor ตอนเปิดเครื่อง)
+  var ROBOT_LED_IP = '172.20.10.3'; 
+
+  function sendRobotEmotion(mode) {
+    if (!ROBOT_LED_IP) return;
+    // ยิงคำสั่งแบบ Fire-and-forget เพื่อไม่ให้หน่วงการทำงานของเว็บแอป
+    fetch(ROBOT_LED_IP + '/emotion?mode=' + encodeURIComponent(mode), {
+      method: 'GET',
+      mode: 'cors'
+    }).catch(function () {
+      // ข้าม Error กรณีบอร์ดยังไม่ได้เปิดหรืออยู่นอกวง Wi-Fi
+    });
+  }
   function hasBackend() {
     return !!GAS_API_URL;
   }
@@ -2103,6 +2116,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     m.reaction = prev === r ? '' : r;
     m.fbBusy = true;
     updateReactBar(idx);
+    sendRobotEmotion(m.reaction || 'idle');
     callServer('submitFeedback', m.logId, r, state.chat.sessionId).then(function (res) {
       if (res && res.ok) {
         m.reaction = res.reaction || '';
