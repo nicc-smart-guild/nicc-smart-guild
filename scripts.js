@@ -124,7 +124,7 @@
 var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYCLZvxX8R-E0R2H0t2P7w7uG2Pjw1JTxFOxigtsAGWAP4Ho/exec';
 
   // ตั้งค่า IP Address ของ ESP32 (ดูจาก Serial Monitor ตอนเปิดเครื่อง)
-  var ROBOT_LED_IP = '172.20.10.3'; 
+  var ROBOT_LED_IP = 'http://172.20.10.3'; 
 
   function sendRobotEmotion(mode) {
     if (!ROBOT_LED_IP) return;
