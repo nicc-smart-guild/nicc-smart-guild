@@ -1,8 +1,6 @@
-// 1. ตั้งค่า URL ของ ESP32 (ต้องมี http:// นำหน้า และใช้ IP ที่ได้จาก Serial Monitor จริง)
-var ROBOT_LED_IP = 'http://192.168.1.45';
+นี่คือโค้ดเต็มของ `scripts-2.js` ที่ปรับแก้ส่วนส่งสีหน้าไปที่ `[http://192.168.1.45/emotion?type=](http://192.168.1.45/emotion?type=)...` ให้เรียบร้อยแล้ว โดยคงโครงสร้าง หน้าตา และฟังก์ชันเดิมทั้งหมดไว้ตามเดิมค่ะ สามารถก๊อปปี้ไปวางทับทั้งไฟล์บน GitHub ได้เลยค่ะ
 
-// รายการ mode ที่รองรับให้ตรงกับฝั่ง ESP32
-var VALID_EMOTIONS = ['happy', 'sad', 'angry', 'surprised', 'love', 'neutral', 'sleep'];
+```javascript
 (function () {
   'use strict';
 
@@ -126,17 +124,37 @@ var VALID_EMOTIONS = ['happy', 'sad', 'angry', 'surprised', 'love', 'neutral', '
     }
     return id;
   }
-var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYCLZvxX8R-E0R2H0t2P7w7uG2Pjw1JTxFOxigtsAGWAP4Ho/exec';
+  var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYCLZvxX8R-E0R2H0t2P7w7uG2Pjw1JTxFOxigtsAGWAP4Ho/exec';
 
-  // ตั้งค่า IP Address ของ ESP32 (ดูจาก Serial Monitor ตอนเปิดเครื่อง)
-  var ROBOT_LED_IP = 'http://192.168.1.45'; 
+  // ตั้งค่า IP Address ของ ESP32 (ต้องมี http:// นำหน้า และตรงกับ Serial Monitor)
+  var ROBOT_LED_IP = 'http://192.168.1.45';
+  var EMOTION_MAP = {
+    normal: 'normal',
+    idle: 'normal',
+    neutral: 'normal',
+    happy: 'happy',
+    greet: 'happy',
+    smile: 'happy',
+    like: 'happy',
+    love: 'love',
+    heart: 'love',
+    wow: 'wow',
+    surprise: 'wow',
+    surprised: 'wow',
+    sad: 'normal',
+    cry: 'normal',
+    angry: 'normal',
+    sleep: 'normal'
+  };
 
   function sendRobotEmotion(mode) {
     if (!ROBOT_LED_IP) return;
-    // ยิงคำสั่งแบบ Fire-and-forget เพื่อไม่ให้หน่วงการทำงานของเว็บแอป
-    fetch(ROBOT_LED_IP + '/emotion?mode=' + encodeURIComponent(mode), {
+    var key = String(mode || 'normal').toLowerCase().trim();
+    var emo = EMOTION_MAP[key] || 'normal';
+    fetch(ROBOT_LED_IP + '/emotion?type=' + encodeURIComponent(emo), {
       method: 'GET',
-      mode: 'cors'
+      mode: 'no-cors',
+      cache: 'no-store'
     }).catch(function () {
       // ข้าม Error กรณีบอร์ดยังไม่ได้เปิดหรืออยู่นอกวง Wi-Fi
     });
@@ -302,7 +320,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       back: '<g transform="translate(188 86)"><rect x="-8" y="-20" width="5" height="13" rx="2" fill="#FFC629" stroke="#E8A800" stroke-width="1.5"/><rect x="3" y="-20" width="5" height="13" rx="2" fill="#FFC629" stroke="#E8A800" stroke-width="1.5"/>' +
         '<rect x="-14" y="-8" width="28" height="30" rx="8" fill="#FFFFFF" stroke="#1655FF" stroke-width="2.5"/><polygon points="3,-2 -7,10 0,10 -4,19 8,6 1,6" fill="#16B890" stroke="#0C8A5E" stroke-width="1.2" stroke-linejoin="round"/>' +
         '<path d="M0 22 q0 12 -2 20" fill="none" stroke="#0B2E8A" stroke-width="5" stroke-linecap="round"/></g>' +
-        '<path d="M164 70 q-10 -4 -14 -14 M212 70 q8 -4 10 -12" stroke="#16B890" stroke-width="3" fill="none" stroke-linecap="round"/>' },
+        '<path d="M164 70 q-10 -4 -14 -14 M212 70 q8 -4 10 -12" stroke="#16B890" stroke-width="3" fill="none" stroke-linecap="round"/>' };
     POSES.electric = { eyes: 'happy', mouth: 'open', L: mArm('M46 172 Q30 192 38 208') + mHand(38, 208), R: mRaiseR(),
       hat: mHardHat('#2A6BFF', '#0B2E8A', '#5C8CFF', '<polygon points="70,34 62,50 69,50 65,60 77,45 70,45 74,34" fill="#FFC629" stroke="#E8A800" stroke-width="1"/>'),
       back: '<circle cx="188" cy="92" r="27" fill="#FFF4D1"/><polygon points="196,64 172,96 186,96 180,122 206,88 191,88 199,64" fill="#FFC629" stroke="#E8A800" stroke-width="2.5" stroke-linejoin="round"/>' };
@@ -1155,23 +1173,13 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
 
   /* ============================================================
    * NICC Card Quest v2 — แนะแนวแบบเกมการ์ดตามหลัก Holland (RIASEC)
-   * ------------------------------------------------------------
-   * หลักการให้คะแนน (ปรับค่าได้ที่ค่าคงที่ด้านล่าง)
-   *   1) จับคู่โดยตรง   : การ์ด → programs/departments × weight (ตามชีต CareerQuestions)
-   *   2) ความสอดคล้อง RIASEC: โปรไฟล์ความสนใจของผู้เล่น เทียบกับรหัส Holland 3 ตัวของแต่ละสาขา
-   *   3) คะแนนรวม = 55% (1) + 45% (2)  แสดงเป็น "ความสอดคล้อง %" (สูงสุด 98%)
-   *   4) ตัวกรองระดับ    : ผู้เล่นเลือก ปวช. (จบ ม.3) หรือ ปวส. (จบ ม.6/ปวช.) → แปลงสาขาให้ตรงระดับ
-   *   5) โหมดเลือก 2 ใบ  : ใบแรก ×1, ใบสอง ×0.6   โหมดตัดทิ้ง: ลบคะแนน ×0.6
-   * ฟิลด์ที่ใช้ได้ใน options_json (ไม่ใส่ก็ได้ ระบบมีค่าสำรอง):
-   *   [..options..]  หรือ  { "stage":"ชื่อด่าน", "mode":"pick|avoid", "pick":2, "options":[..] }
-   *   option: label, title, desc, image_url, theme, pose, programs[], departments[], weight, riasec{R,I,A,S,E,C: 0-3}
    * ============================================================ */
-  var QUEST_MAX_ROUNDS = 12;    // จำนวนรอบสูงสุดต่อเกม
-  var QUEST_PICK_DELAY = 700;   // ms ค้างให้เห็นการ์ดที่เลือกก่อนไปรอบถัดไป
-  var QUEST_THINK_MS = 2600;    // ms หน้าประมวลผล
-  var QUEST_ALTS = 3;           // จำนวนสาขารองที่แสดง
-  var QUEST_SECOND = 0.6;       // น้ำหนักการ์ดใบที่ 2 (โหมดเลือกหลายใบ)
-  var QUEST_AVOID = 0.6;        // น้ำหนักลบของการ์ดที่ตัดทิ้ง
+  var QUEST_MAX_ROUNDS = 12;
+  var QUEST_PICK_DELAY = 700;
+  var QUEST_THINK_MS = 2600;
+  var QUEST_ALTS = 3;
+  var QUEST_SECOND = 0.6;
+  var QUEST_AVOID = 0.6;
   var QUEST_W_DIRECT = 0.55, QUEST_W_FIT = 0.45;
 
   var QUEST_THEMES = [
@@ -1191,7 +1199,6 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     E: { name: 'นำและโน้มน้าว', short: 'นักขับเคลื่อน', theme: 'gold', desc: 'ชอบเป็นผู้นำ วางแผน และขับเคลื่อนให้งานสำเร็จ' },
     C: { name: 'เป็นระบบ ละเอียด', short: 'นักจัดระบบ', theme: 'sky', desc: 'ชอบความเป็นระเบียบ ละเอียด และทำตามขั้นตอน' }
   };
-  /* รหัส Holland (เรียงจากเด่นสุด) ของแต่ละสาขา — จับจากชื่อสาขา/แผนก; ใส่ชื่อคอลัมน์ holland ในชีต Programs เพื่อกำหนดเองได้ */
   var QUEST_HOLLAND = [
     [/บริการยานยนต์/, 'RES'], [/ยานยนต์ไฟฟ้า/, 'RIC'], [/ช่างยนต์|เครื่องกล|จักรกล/, 'RIC'],
     [/กลโรงงาน|การผลิต/, 'RCI'], [/ไฟฟ้า|ช่างไฟ/, 'RIC'], [/ก่อสร้าง/, 'RCE'],
@@ -1285,7 +1292,6 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     qArr(o.departments).forEach(function (did) { progs.forEach(function (p) { if (String(p.department_id) === did) hit[p.id] = 1; }); });
     return Object.keys(hit);
   }
-  /* แปลงสาขาที่การ์ดชี้ไป ให้เป็นสาขาในระดับที่ผู้เล่นเลือก (เช่น ช่างยนต์ ปวช. → เทคนิคเครื่องกล ปวส. ของแผนกเดียวกัน) */
   function qTargets(o, level) {
     var progs = D().programs || [], out = {};
     qHits(o).forEach(function (id) {
@@ -1299,7 +1305,6 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     });
     return Object.keys(out);
   }
-  /* เวกเตอร์ความสนใจของการ์ด: ใช้ riasec ในการ์ด ถ้าไม่มีให้เฉลี่ยจากรหัส Holland ของสาขาที่การ์ดชี้ไป */
   function qOptVec(o) {
     var v = qZero(), tags = o && o.riasec, any = false;
     if (tags && typeof tags === 'object') {
@@ -1335,7 +1340,6 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     return { vec: vec, order: order, max: vec[order[0]] || 0, sum: sum, top: order.filter(function (L) { return vec[L] > 0; }).slice(0, 3) };
   }
 
-  /* ---------- คำนวณผล ---------- */
   function questScore() {
     var deck = questDeck(), s = questState(), level = s.level, progs = D().programs || [];
     var direct = {}, rounds = {}, why = {}, dumped = {}, ideal = 0, answered = 0;
@@ -1359,7 +1363,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       });
     });
     var profile = questProfile(), ids = Object.keys(direct).filter(function (id) { return direct[id] > 0; });
-    if (!ids.length) {   // ข้อมูลการ์ดไม่ได้ผูกสาขา → ใช้ความสอดคล้อง RIASEC อย่างเดียว
+    if (!ids.length) {
       ids = progs.filter(function (p) { var l = qLvl(p); return qCode(p) && (!level || !l || l === level); }).map(function (p) { return p.id; });
     }
     var ranked = ids.map(function (id) {
@@ -1374,8 +1378,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     return { ranked: ranked, profile: profile, answered: answered, total: deck.length, level: level };
   }
 
-  /* ---------- ธีม / ท่าทางของการ์ด ---------- */
-  function questOptTheme(o, idx) {   // คืน [ดัชนีธีม, ล็อกสีหรือไม่]
+  function questOptTheme(o, idx) {
     var k = themeIndex(String((o && o.theme) || '').toLowerCase());
     if (k >= 0) return [k, true];
     var v = qOptVec(o), best = '', max = 0;
@@ -1386,7 +1389,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     for (i = 0; i < rules.length; i++) if (rules[i][0].test(text)) return [themeIndex(rules[i][1]), false];
     return [idx % QUEST_THEMES.length, false];
   }
-  function questRoundThemes(q) {   // การ์ดที่สีไม่ล็อก จะเลี่ยงสีซ้ำกันในรอบเดียวกัน
+  function questRoundThemes(q) {
     var used = {}, L = QUEST_THEMES.length, info = q.options.map(function (o, i) { return questOptTheme(o, i); });
     info.forEach(function (x) { if (x[1]) used[x[0]] = 1; });
     return info.map(function (x) {
@@ -1430,7 +1433,6 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     return { names: names, idx: idx };
   }
 
-  /* ---------- Render ---------- */
   function questSwitchBar(toQuest) {
     return '<div class="quest-switch">' + (toQuest
       ? '<button type="button" class="btn btn-accent btn-sm" data-action="quest-mode">' + icon('chat', 'sm') + 'สลับไปเล่นโหมดจั่วการ์ด</button>'
@@ -1577,7 +1579,6 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       '<p class="q-note">ตอบ ' + r.answered + ' จาก ' + r.total + ' รอบ' + (r.level ? ' • ระดับ ' + esc(r.level) : '') + ' • ผลเป็นข้อเสนอแนะเบื้องต้นจากความสนใจ ไม่ใช่การประเมินความสามารถ</p></section>';
   }
 
-  /* ---------- ตัวควบคุมหลัก (แทนชื่อเดิม renderCareerBody; ของเดิมคือ renderCareerClassic) ---------- */
   function renderCareerBody() {
     var box = $('#career-body');
     if (!box) return;
@@ -1622,7 +1623,6 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     state.quest = freshQuest('quest', 'pick', level);
     questShow(true);
   }
-  /* อัปเดตการ์ด/มิเตอร์/คำพูดน้องนิคทันทีที่แตะ โดยไม่วาดหน้าใหม่ (ลื่นบน iPad) */
   function questPaint(q, cur, cheer) {
     var grid = $('#qgrid'), need = qNeed(q);
     if (grid) {
@@ -1678,13 +1678,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
     questShow(true);
   }
 
-  /* ---------- Kiosk: รีเซ็ตเกม/หน้าเว็บเมื่อระบบสั่งหรือไม่มีการใช้งาน ----------
-   * ทางที่ระบบภายนอกสั่งรีเซ็ตได้:
-   *   1) document.dispatchEvent(new CustomEvent('nicc:kiosk-reset'))   → รีเซ็ตทุกอย่างและกลับหน้าหลัก
-   *   2) window.NICCKiosk.reset()                                      → เหมือนข้อ 1
-   *   3) window.NICCKiosk.resetQuest()                                 → รีเซ็ตเฉพาะเกม
-   * ตั้งเวลาไม่มีการใช้งานอัตโนมัติ (ไม่บังคับ): ชีต Settings คีย์ kiosk_idle_seconds (≥ 15) หรือ window.NICC_KIOSK_IDLE_SEC
-   */
+  /* ---------- Kiosk ---------- */
   var kiosk = { bound: false, timer: 0 };
   function resetQuest() {
     questClearTimers();
@@ -1722,14 +1716,13 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       kiosk.bound = true;
       document.addEventListener('nicc:kiosk-reset', kioskReset);
       ['pointerdown', 'touchstart', 'keydown'].forEach(function (ev) { document.addEventListener(ev, kioskArm, { passive: true }); });
-      window.addEventListener('pageshow', function (e) { if (e.persisted) resetQuest(); });   // กลับมาจาก bfcache
+      window.addEventListener('pageshow', function (e) { if (e.persisted) resetQuest(); });
       window.NICCKiosk = { reset: kioskReset, resetQuest: resetQuest };
     }
     kioskArm();
   }
 
   /* ---------- สมัครเรียน: ภาพประกาศ + ตัวอย่างเอกสาร ---------- */
-  /* ลิงก์ Google Drive / Docs → ลิงก์ฝังดูในหน้าเว็บ (preview) และลิงก์ดาวน์โหลด */
   function driveInfo(url) {
     var u = safeUrl(url), m;
     if (!u) return null;
@@ -2244,7 +2237,6 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
       navigate(el.getAttribute('data-nav'), q ? { q: q } : {});
       return;
     }
-    // ปุ่มที่มีทั้ง data-action อยู่ภายในการ์ดที่มี data-action: ใช้ตัวในสุดเสมอ (closest)
     switch (action) {
       case 'program': openProgram(el.getAttribute('data-id')); break;
       case 'img-view': openRoundImage(el.getAttribute('data-id')); break;
@@ -2255,7 +2247,7 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
         break;
       case 'news': openNews(el.getAttribute('data-id')); break;
       case 'open-link':
-        if (e.target.closest && e.target.closest('a[href]')) break;   // กดที่ลิงก์โดยตรง ให้เบราว์เซอร์เปิดเอง ไม่เปิดซ้ำ
+        if (e.target.closest && e.target.closest('a[href]')) break;
         var href = safeUrl(el.getAttribute('data-href'));
         if (href) { try { window.open(href, '_blank', 'noopener'); } catch (err) { showToast('เปิดลิงก์ไม่ได้ กรุณาลองกดปุ่ม “อ่านเพิ่มเติม”', 'err'); } }
         break;
@@ -2313,7 +2305,6 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
         state.career = { i: 0, answers: [], done: false };
         renderCareerBody();
         break;
-      /* ---- NICC Card Quest ---- */
       case 'quest-start': questStart(el.getAttribute('data-level') || ''); break;
       case 'quest-pick': questPick(Number(el.getAttribute('data-idx'))); break;
       case 'quest-prev': questPrev(); break;
@@ -2403,3 +2394,25 @@ var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwg8wCAuusSyHotm3-QYC
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
+```[cite: 5]
+
+<Steps>
+  <Step subtitle="1 นาที" title="วางโค้ดลงในไฟล์สคริปต์บน GitHub แล้วบันทึก">
+    คัดลอกโค้ดด้านบนไปวางแทนที่เนื้อหาในไฟล์สคริปต์บน GitHub แล้วกด Commit / บันทึกการเปลี่ยนแปลง[cite: 5]
+    *Verification:* ไฟล์บน GitHub มีเนื้อหาอัปเดตเป็นเวอร์ชันล่าสุดและไม่มีเครื่องหมาย syntax error
+  </Step>
+  <Step subtitle="1 นาที" title="เปิดหน้าเว็บแล้วลองกดปุ่มรีแอคชันในหน้าแชต">
+    เปิดหน้าเว็บบนอุปกรณ์ที่ต่อ Wi-Fi วงเดียวกับบอร์ด (`192.168.1.45`) เข้าหน้า **ถาม AI** แล้วลองกดปุ่มรีแอคชันใต้คำตอบพร้อมดู **Serial Monitor** บน Arduino IDE[cite: 4, 5]
+    *Verification:* หน้าต่าง Serial Monitor แสดง `[web] Emotion -> ...` และจอ LED เปลี่ยนสีหน้าตามคำสั่ง[cite: 4, 5]
+  </Step>
+</Steps>
+
+<ElicitationsGroup message="หลังวางโค้ดแล้วเจออาการไหน เลือกจุดที่อยากเช็กต่อได้เลยค่ะ:">
+  <Elicitation label="กดปุ่มแล้วจอไม่เปลี่ยน" query="วางโค้ดแล้วลองกดปุ่มบนหน้าเว็บ แต่ Serial Monitor ไม่ขึ้นคำสั่ง แก้ยังไงคะ"/>
+  <Elicitation label="ติดบล็อก HTTPS" query="หน้าเว็บเปิดเป็น HTTPS แล้วกดปุ่มสั่ง [http://192.168.1.45/](http://192.168.1.45/) ไม่ได้ ต้องแก้ยังไงคะ"/>
+  <Elicitation label="เพิ่มปุ่มเปลี่ยนสีหน้า" query="อยากให้เปลี่ยนสีหน้าตอนเปลี่ยนเมนูหรือส่งคำถามด้วย ต้องเพิ่มตรงไหนคะ"/>
+</ElicitationsGroup>
+
+<FollowUp label="Want me to check why button clicks on the GitHub page do not reach the ESP32 if you test it?" query="Yes, help me check why pressing buttons on the GitHub page does not trigger the ESP32."/>
+
+```
