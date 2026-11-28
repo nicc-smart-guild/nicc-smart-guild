@@ -1,6 +1,3 @@
-นี่คือโค้ดเต็มของ `scripts-2.js` ที่ปรับแก้ส่วนส่งสีหน้าไปที่ `[http://192.168.1.45/emotion?type=](http://192.168.1.45/emotion?type=)...` ให้เรียบร้อยแล้ว โดยคงโครงสร้าง หน้าตา และฟังก์ชันเดิมทั้งหมดไว้ตามเดิมค่ะ สามารถก๊อปปี้ไปวางทับทั้งไฟล์บน GitHub ได้เลยค่ะ
-
-```javascript
 (function () {
   'use strict';
 
@@ -2394,25 +2391,3 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
-```[cite: 5]
-
-<Steps>
-  <Step subtitle="1 นาที" title="วางโค้ดลงในไฟล์สคริปต์บน GitHub แล้วบันทึก">
-    คัดลอกโค้ดด้านบนไปวางแทนที่เนื้อหาในไฟล์สคริปต์บน GitHub แล้วกด Commit / บันทึกการเปลี่ยนแปลง[cite: 5]
-    *Verification:* ไฟล์บน GitHub มีเนื้อหาอัปเดตเป็นเวอร์ชันล่าสุดและไม่มีเครื่องหมาย syntax error
-  </Step>
-  <Step subtitle="1 นาที" title="เปิดหน้าเว็บแล้วลองกดปุ่มรีแอคชันในหน้าแชต">
-    เปิดหน้าเว็บบนอุปกรณ์ที่ต่อ Wi-Fi วงเดียวกับบอร์ด (`192.168.1.45`) เข้าหน้า **ถาม AI** แล้วลองกดปุ่มรีแอคชันใต้คำตอบพร้อมดู **Serial Monitor** บน Arduino IDE[cite: 4, 5]
-    *Verification:* หน้าต่าง Serial Monitor แสดง `[web] Emotion -> ...` และจอ LED เปลี่ยนสีหน้าตามคำสั่ง[cite: 4, 5]
-  </Step>
-</Steps>
-
-<ElicitationsGroup message="หลังวางโค้ดแล้วเจออาการไหน เลือกจุดที่อยากเช็กต่อได้เลยค่ะ:">
-  <Elicitation label="กดปุ่มแล้วจอไม่เปลี่ยน" query="วางโค้ดแล้วลองกดปุ่มบนหน้าเว็บ แต่ Serial Monitor ไม่ขึ้นคำสั่ง แก้ยังไงคะ"/>
-  <Elicitation label="ติดบล็อก HTTPS" query="หน้าเว็บเปิดเป็น HTTPS แล้วกดปุ่มสั่ง [http://192.168.1.45/](http://192.168.1.45/) ไม่ได้ ต้องแก้ยังไงคะ"/>
-  <Elicitation label="เพิ่มปุ่มเปลี่ยนสีหน้า" query="อยากให้เปลี่ยนสีหน้าตอนเปลี่ยนเมนูหรือส่งคำถามด้วย ต้องเพิ่มตรงไหนคะ"/>
-</ElicitationsGroup>
-
-<FollowUp label="Want me to check why button clicks on the GitHub page do not reach the ESP32 if you test it?" query="Yes, help me check why pressing buttons on the GitHub page does not trigger the ESP32."/>
-
-```
